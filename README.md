@@ -1,4 +1,4 @@
 CoreQueries
 ===========
 
-The integration component that exposes read only services of the Agile Banking Project.
+It is an integration component that handles all Rs of CRUD of the core components of the Agile Banking.
