@@ -51,12 +51,12 @@ class CurrencyController {
             )        
         }     
         
-    def getFullList() {
-        // ../currency/getFullListOfIso3
+    def list() {
+        // ../currency/getFullList
         redirect (
             controller: "CoreServer", 
             action: "renderResponce", 
-            params:[sourceComponent:"Commons", sourceURI:"/currency/list.json",
+            params:[sourceComponent:"Commons", sourceURI:"/currency/index.json",
             "caller":"$request.forwardURI" ,"params":params]
             )         
         }      

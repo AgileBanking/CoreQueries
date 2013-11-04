@@ -1,16 +1,16 @@
 dataSource {
     //h2
-//    pooled = true
-//    driverClassName = "org.h2.Driver"
-//    username = "sa"
-//    password = ""
+    pooled = true
+    driverClassName = "org.h2.Driver"
+    username = "sa"
+    password = ""
     
     // MySQL
-    pooled = true
-    driverClassName = "com.mysql.jdbc.Driver"
-    username = "nick"
-    password = "master"
-    dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
+//    pooled = true
+//    driverClassName = "com.mysql.jdbc.Driver"
+//    username = "nick"
+//    password = "master"
+//    dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
 ////    password = "bitnami"       
 }
 hibernate {
@@ -23,9 +23,9 @@ environments {
     development {
         dataSource {
             dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', '', 'create-drop'
-//            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
-//            url = "jdbc:mysql://localhost:3306/reqdb" 
-            url = "jdbc:mysql://localhost:3306/corequeries" 
+            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
+//            url = "jdbc:mysql://localhost:3306/reqdb" // or ...
+//            url = "jdbc:mysql://localhost:3306/corequeries" 
             username = "nick"
             password = "master"
         }

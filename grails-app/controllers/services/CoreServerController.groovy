@@ -25,7 +25,7 @@ class CoreServerController {
             } 
         params.reqID = UUID.randomUUID().toString()
         params.timestamp = new Date().toString()
-        def answer = ["header":params, "body":resp.json.sort()]
+        def answer = ["header":params, "body":resp.json]
         
         def comp2 = entities.Component.findByName("Auditor")
         if (comp2 && entities.Component.findByName("Auditor").isActive) {
