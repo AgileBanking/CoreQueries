@@ -3,7 +3,7 @@ import grails.plugins.rest.client.RestBuilder
 import grails.converters.*
 
 class CountryController {
-    static allowedMethods = [getFullList: "GET"]
+    static allowedMethods = [list: "GET"]
     
     def index() {redirect(action: "list", params: params) }
     
