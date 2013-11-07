@@ -5,15 +5,13 @@ import grails.converters.*
 class CountryController {
     static allowedMethods = [getFullList: "GET"]
     
-    def index() {redirect(action: "getFullList", params: params) }
+    def index() {redirect(action: "list", params: params) }
     
-    def getFullList() {
+    def list() {
         // ../country/getFullList
-        redirect (
-            controller: "CoreServer", 
-            action: "renderResponce", 
-            params:[sourceComponent:"Commons", sourceURI:"/country/list.json",
-            "caller":"$request.forwardURI" ,"params":params]
-            )         
+        params.sourceComponent="Commons"
+        params.sourceURI="/country/index.json"
+        params.caller = "$request.forwardURI" 
+        render RenderService.serviceMethod(params)    
     }          
 }

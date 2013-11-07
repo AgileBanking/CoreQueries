@@ -8,13 +8,13 @@ class CurrencyController {
 //    LinkGenerator grailsLinkGenerator
 //    def components = ConfigurationHolder.config.app.components
 
-    static allowedMethods = [getByIso3:'GET', getListOfIso3:'GET', getFullList:'GET']
+    static allowedMethods = [get:'GET', listShort:'GET', list:'GET']
         
-    def index() { redirect(action: "getListOfIso3", params: params) }
+    def index() { redirect(action: "shortList", params: params) }
     
     def RenderService
     
-    def getByIso3(String iso3) {
+    def get(String iso3) {
         // ../CoreQueries/currency/getByIso3?iso3=EUR
         if (iso3==null || iso3.size()!=3){
             response.status = 400 // 400 Bad Request
