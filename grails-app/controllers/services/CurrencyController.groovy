@@ -9,8 +9,10 @@ class CurrencyController {
 //    def components = ConfigurationHolder.config.app.components
 
     static allowedMethods = [getByIso3:'GET', getListOfIso3:'GET', getFullList:'GET']
-    
+        
     def index() { redirect(action: "getListOfIso3", params: params) }
+    
+    def RenderService
     
     def getByIso3(String iso3) {
         // ../CoreQueries/currency/getByIso3?iso3=EUR
@@ -21,44 +23,30 @@ class CurrencyController {
         }
         else {
             def uri = "/currency/getByIso3?iso3="+ iso3.toUpperCase()
-//            println "redirect to $uri" 
-            redirect (
-                controller: "CoreServer", 
-                action: "renderResponce", 
-                params:[sourceComponent:"Commons", sourceURI:"$uri",
-                "caller":"$request.forwardURI" ,"params":params]
-                )
+//            println "redirect to $uri"
+            params.sourceComponent="Commons"
+            params.sourceURI="$uri" 
+            params.caller = "$request.forwardURI" 
+//            render RenderService.serviceMethod(params) 
+            render RenderService.serviceMethod(params) 
             }
-        }
-//    def getShortListOfIso3() {
-//        // ../currency/getShortListOfIso3
-//        redirect (
-//            controller: "CoreServer", 
-//            action: "renderResponce", 
-//            params: [sourceComponent:"Commons", sourceURI:"/currency/getShortListOfIso3",
-//            "caller":"$request.forwardURI" ,"params":params]
-//            )
-//        }   
+        }  
         
-    def getListOfIso3() {
+    def shortList() {
         // ../CoreQueries/currency/getListOfIso3
 //        println "redirect to /currency/getListOfIso3"
-        redirect (
-            controller: "CoreServer", 
-            action: "renderResponce", 
-            params:[sourceComponent:"Commons", sourceURI:"/currency/getListOfIso3",
-            "caller":"$request.forwardURI" ,"params":params]
-            )        
+        params.sourceComponent="Commons"
+        params.sourceURI="/currency/shortList"
+        params.caller = "$request.forwardURI" 
+        render RenderService.serviceMethod(params)       
         }     
         
     def list() {
         // ../currency/getFullList
-        redirect (
-            controller: "CoreServer", 
-            action: "renderResponce", 
-            params:[sourceComponent:"Commons", sourceURI:"/currency/index.json",
-            "caller":"$request.forwardURI" ,"params":params]
-            )         
+        params.sourceComponent="Commons"
+        params.sourceURI="/currency/index.json"
+        params.caller = "$request.forwardURI" 
+        render RenderService.serviceMethod(params)        
         }      
 }
     

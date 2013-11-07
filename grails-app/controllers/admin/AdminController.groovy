@@ -52,8 +52,8 @@ class AdminController {
     def relationsDiagram(String ComponentName)  {
         if (ComponentName == "Core" || ComponentName==null) {
             def url = "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/"
-            url += "[CoreServer]<>1-  0..*>[Accounts], [CoreServer]<>1-  0..*>[Commons], [CoreServer]<>1-  0..*>[Parties], [CoreServer]<>1-  0..*>[Products],"
-            url += "[CoreServer]<>1-  0..*>[Repo]"
+            url += "[CoreQueries]<>1-0..*>[Accounts], [CoreQueries]<>1-0..*>[Commons], [CoreQueries]<>1-0..*>[Parties], [CoreQueries]<>1-0..*>[Products],[CoreQueries]<>1-0..*>[API Repository],"
+            url += "[CoreUpdates]<>1-0..*>[Accounts], [CoreUpdates]<>1-0..*>[Commons], [CoreUpdates]<>1-0..*>[Parties], [CoreUpdates]<>1-0..*>[Products],[CoreUpdates]<>1-0..*>[API Repository],"       
             redirect (url:"$url")
             return
         }
@@ -122,7 +122,7 @@ class AdminController {
             if (!c.fullName.contains("grails") ){
                 "$fullName" { 
 //                    println "set actions of $c.name to: " + c.getURIs().collect({ uri -> c.getMethodActionName(uri)}).unique().sort() - "index"
-                    actions=c.getURIs().collect({ uri -> c.getMethodActionName(uri)}).unique().sort() - "index"
+                    actions=c.getURIs().collect({ uri -> c.getMethodActionName(uri)}).unique().sort() // - "index"
 //                    println "actions: " + actions
                     actions.each { a ->
 //                        println "a: $a"
