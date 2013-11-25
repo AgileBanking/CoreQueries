@@ -9,7 +9,7 @@
 				border: .2em solid #fff;
 				margin: 2em 2em 1em;
 				padding: 1em;
-				width: 12em;
+				width: 16em;
 				float: left;
 				-moz-box-shadow: 0px 0px 1.25em #ccc;
 				-webkit-box-shadow: 0px 0px 1.25em #ccc;
@@ -85,21 +85,23 @@
 		<div id="status" role="complementary">
                   <h1>System Status</h1>
                   <ul>
-                    <li>Computer: ${InetAddress.getLocalHost().getHostName()}</li>
+                    <li>Host Server: ${InetAddress.getLocalHost().toString()}</li>
                     <li>User: ${System.getProperty("user.name")}</li>
                     <li>Time zone: ${TimeZone.getDefault().getDisplayName()}</li>
                   </ul>
                     <h1>Application Status</h1>
 			<ul>
-				<li>App version: <g:meta name="app.version"/></li>
-				<li>Grails version: <g:meta name="app.grails.version"/></li>
-				<li>Groovy version: ${GroovySystem.getVersion()}</li>
-				<li>JVM version: ${System.getProperty('java.version')}</li>
-				<li>Reloading active: ${grails.util.Environment.reloadingAgentEnabled}</li>
-				<li>Controllers: ${grailsApplication.controllerClasses.size()}</li>
-				<li>Domains: ${grailsApplication.domainClasses.size()}</li>
-				<li>Services: ${grailsApplication.serviceClasses.size()}</li>
-				<li>Tag Libraries: ${grailsApplication.tagLibClasses.size()}</li>
+                            <li>App version: <g:meta name="app.version"/></li>
+                            <li>Grails version: <g:meta name="app.grails.version"/></li>
+                            <li>Groovy version: ${GroovySystem.getVersion()}</li>
+                            <li>JVM version: ${System.getProperty('java.version')}</li>
+                            <li>Database: ${grailsApplication.config.dataSource.url}</li>
+                            <li>dbCreate: ${grailsApplication.config.dataSource.dbCreate}</li>
+                            <li>Reloading active: ${grails.util.Environment.reloadingAgentEnabled}</li>
+                            <li>Controllers: ${grailsApplication.controllerClasses.size()}</li>
+                            <li>Domains: ${grailsApplication.domainClasses.size()}</li>
+                            <li>Services: ${grailsApplication.serviceClasses.size()}</li>
+                            <li>Tag Libraries: ${grailsApplication.tagLibClasses.size()}</li>
 			</ul>
 			<h1>Installed Plugins</h1>
 			<ul>
@@ -118,7 +120,7 @@
 				<h2>Available Controllers:</h2>
 				<ul>
 					<g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
-						<li class="controller"><g:link controller="${c.logicalPropertyName}">${c.fullName - 'admin.' - 'Controller' - 'entities.'}</g:link></li>
+						<li class="controller"><g:link controller="${c.logicalPropertyName}">${c.fullName - 'admin.' - 'Controller' - 'services.' - 'entities.'}</g:link></li>
 					</g:each>
 				</ul>
 			</div>

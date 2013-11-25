@@ -13,6 +13,7 @@ class RenderService {
         def answer = ""
         def rest = new RestBuilder()
         try {
+//            println baseURL + "$params.sourceURI"
             def resp = rest.get(baseURL + "$params.sourceURI") {
                 accept "application/json"
                 contentType "application/json"
@@ -20,8 +21,7 @@ class RenderService {
                 answer = ["header":params, "body":resp.json]
         } 
         catch(e) {
-            render status: NOT_FOUND
-            return
+            return [error: "$e.cause.message" ] as JSON// 404 Not Found
         }
 //        println "resp: $resp.toString()" 
         
@@ -34,15 +34,15 @@ class RenderService {
                 answer.header.audited="true"
                 def restAudit = new RestBuilder()
                 def url = entities.Component.findByName("Auditor").baseURL 
-                println answer as JSON
+//                println answer as JSON
                 print "Auditdb Url: $url"
                 def respAudit = restAudit.post(url){
                     contentType "application/json"
                     json {answer}
                 }
-                println "respAudit.json: $respAudit.json" 
+//                println "respAudit.json: $respAudit.json" 
                 answer.header.reqID = "$respAudit.json.id"
-                println "id=$respAudit.json.id, $answer.header.reqID" 
+//                println "id=$respAudit.json.id, $answer.header.reqID" 
             } 
             else { 
                 answer.header.auditDB="available"
