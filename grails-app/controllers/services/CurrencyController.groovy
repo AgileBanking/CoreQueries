@@ -22,9 +22,11 @@ class CurrencyController {
             render answer as JSON
         }
         else {
-            def uri = "/currency/getByIso3?iso3="+ iso3.toUpperCase()
+            def uri = "/currency/getByIso3?iso3="+ iso3.toUpperCase()  //internal requestt to domains
             params.sourceComponent="Commons"
             params.sourceURI="$uri" 
+            params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + grailsApplication.metadata.'app.name' + "/$controllerName"  
+            params.URL += "/get?iso3="+ iso3.toUpperCase()
             params.caller = "$request.forwardURI" 
             render RenderService.serviceMethod(params) 
             }
@@ -32,15 +34,19 @@ class CurrencyController {
         
     def shortList() {
         // ../CoreQueries/currency/shortList
+        params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + grailsApplication.metadata.'app.name' + "/$controllerName"       
         params.sourceComponent="Commons"
+        params.URL += "/shortList"
         params.sourceURI="/currency/shortList"
-        params.caller = "$request.forwardURI" 
+//        params.caller = "$request.forwardURI" 
         render RenderService.serviceMethod(params)       
         }     
         
     def list() {
         // ../currency/list
         params.sourceComponent="Commons"
+        params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + grailsApplication.metadata.'app.name' + "/$controllerName"  
+        params.URL += "/list"
         params.sourceURI="/currency/index.json"
         params.caller = "$request.forwardURI" 
         render RenderService.serviceMethod(params)        

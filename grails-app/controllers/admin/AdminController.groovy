@@ -129,7 +129,7 @@ class AdminController {
 //                        if ("$a"==defaultAction) {
 //                            "$a" "defaultAction"}
 //                        else {
-                            "$a" "../$c.name/$a"
+                            "$a" "/$c.name/$a"
 //                        }
                     }
                 }
