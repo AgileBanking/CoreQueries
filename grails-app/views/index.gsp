@@ -83,32 +83,35 @@
 	<body>
 		<a href="#page-body" class="skip"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
 		<div id="status" role="complementary">
-                  <h1>System Status</h1>
-                  <ul>
-                    <li>Host Server: ${InetAddress.getLocalHost().toString()}</li>
-                    <li>User: ${System.getProperty("user.name")}</li>
-                    <li>Time zone: ${TimeZone.getDefault().getDisplayName()}</li>
-                  </ul>
-                    <h1>Application Status</h1>
+                      <h1>System Status</h1>
+                          <ul>
+                            <li>User: ${System.getProperty("user.name")}</li>
+                            <li>Time zone: ${TimeZone.getDefault().getDisplayName()}</li>
+                            <li>Server Time: ${new Date().getDateTimeString()}</li>
+                          </ul>
+			<h1>Application Status</h1>
 			<ul>
                             <li>App version: <g:meta name="app.version"/></li>
                             <li>Grails version: <g:meta name="app.grails.version"/></li>
-                            <li>Groovy version: ${GroovySystem.getVersion()}</li>
                             <li>JVM version: ${System.getProperty('java.version')}</li>
-                            <li>Database: ${grailsApplication.config.dataSource.url}</li>
-                            <li>dbCreate: ${grailsApplication.config.dataSource.dbCreate}</li>
                             <li>Reloading active: ${grails.util.Environment.reloadingAgentEnabled}</li>
                             <li>Controllers: ${grailsApplication.controllerClasses.size()}</li>
                             <li>Domains: ${grailsApplication.domainClasses.size()}</li>
                             <li>Services: ${grailsApplication.serviceClasses.size()}</li>
                             <li>Tag Libraries: ${grailsApplication.tagLibClasses.size()}</li>
 			</ul>
+                        <h1>Server</h1>
+                        <ul>
+                            <li>Local Host Name: ${InetAddress.localHost.hostName}</li>
+                            <li>IP Address     : ${InetAddress.localHost.hostAddress}</li> 
+                            <li>Host Name      : ${InetAddress.localHost.canonicalHostName}</li>
+                        </ul>
 			<h1>Installed Plugins</h1>
-			<ul>
+                            <ul>
 				<g:each var="plugin" in="${applicationContext.getBean('pluginManager').allPlugins}">
 					<li>${plugin.name} - ${plugin.version}</li>
 				</g:each>
-			</ul>
+                            </ul>
 		</div>
 		<div id="page-body" role="main">
 			<h1>Welcome to  Agile Banking</h1>

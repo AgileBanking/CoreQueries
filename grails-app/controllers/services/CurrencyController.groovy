@@ -2,7 +2,6 @@ package services
 
 import grails.plugins.rest.client.RestBuilder
 import grails.converters.*
-//import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 class CurrencyController {
 //    LinkGenerator grailsLinkGenerator
@@ -25,18 +24,18 @@ class CurrencyController {
             def uri = "/currency/getByIso3?iso3="+ iso3.toUpperCase()  //internal requestt to domains
             params.sourceComponent="Commons"
             params.sourceURI="$uri" 
-            params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + grailsApplication.metadata.'app.name' + "/$controllerName"  
-            params.URL += "/get?iso3="+ iso3.toUpperCase()
-            params.caller = "$request.forwardURI" 
+            params.URL =  RenderService.URL(request) 
+            params.URL += "?iso3="+ iso3.toUpperCase()
+//            params.caller = "$request.forwardURI" 
             render RenderService.serviceMethod(params) 
             }
         }  
         
     def shortList() {
         // ../CoreQueries/currency/shortList
-        params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + grailsApplication.metadata.'app.name' + "/$controllerName"       
+        //params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + RenderService.AppName(request) + "/$controllerName"  
+        params.URL =  RenderService.URL(request) 
         params.sourceComponent="Commons"
-        params.URL += "/shortList"
         params.sourceURI="/currency/shortList"
 //        params.caller = "$request.forwardURI" 
         render RenderService.serviceMethod(params)       
@@ -45,10 +44,9 @@ class CurrencyController {
     def list() {
         // ../currency/list
         params.sourceComponent="Commons"
-        params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + grailsApplication.metadata.'app.name' + "/$controllerName"  
-        params.URL += "/list"
+        params.URL =  RenderService.URL(request) 
         params.sourceURI="/currency/index.json"
-        params.caller = "$request.forwardURI" 
+//        params.caller = "$request.forwardURI" 
         render RenderService.serviceMethod(params)        
         }      
 }
