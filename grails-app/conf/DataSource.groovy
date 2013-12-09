@@ -26,8 +26,8 @@ environments {
             url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
 //            url = "jdbc:mysql://localhost:3306/reqdb" // or ...
 //            url = "jdbc:mysql://localhost:3306/corequeries" 
-            username = "nick"
-            password = "master"
+//            username = "nick"
+//            password = "master"
         }
     }
     test {

@@ -107,21 +107,8 @@ class ComponentController {
         [componentInstance: componentInstance]
     }
     
-//    def get(Long id) {
-//        def componentInstance = Component.get(id)
-//        if (!componentInstance) {
-//            flash.message = message(code: 'default.not.found.message', args: [message(code: 'component.label', default: 'Component'), id])
-//            redirect(action: "list")
-//            return
-//        }
-//        withFormat{
-//            json {render componentInstance as JSON}
-//            xml  {render componentInstance as XML}
-//            rss {render componentInstance}
-//        }
-//    }
 
-    def edit = {
+    def edit = {       
         def componentInstance = Component.get(params.id)
         if (!componentInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'component.label', default: 'Component'), params.id])}"

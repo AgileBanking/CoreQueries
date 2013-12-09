@@ -2,14 +2,11 @@ package services
 
 import grails.converters.JSON
 
-class CurrencyController {
-//    LinkGenerator grailsLinkGenerator
-//    def components = ConfigurationHolder.config.app.components
-
+class OrgUnitTypeController {
     static allowedMethods = [
         get: "GET",
-        getByIso3:'GET', 
-        shortList:'GET', 
+        getByCode:'GET', 
+        listShort:'GET', 
         list:'GET']
         
     def index() { redirect(action: "shortList", params: params) }
@@ -17,55 +14,58 @@ class CurrencyController {
     def RenderService
     
     def get(Long id) {
-        // ../CoreQueries/currency/get?id=1
-        if (id==null ) {
+        // ../CoreQueries/orgUnitType/get?id=3
+        if (params.id==null ) {
             response.status = 400 // 400 Bad Request
             def answer = ["error":["status":"400", "id":"$id"]]
             render answer as JSON
         }
         else {
-            def uri = "/currency/show/$id" + ".json" //internal request to domains
+            def uri = "/orgUnitType/show/$id" + ".json" //internal request to domains
             params.sourceComponent="Commons"
             params.sourceURI="$uri" 
             params.URL =  RenderService.URL(request) 
             params.URL += "?id=$id"
             render RenderService.serviceMethod(params) 
             }
-        }  
+        } 
         
-    def getByIso3(String iso3) {
-        // ../CoreQueries/currency/get?iso3=EUR
-        if (iso3==null || iso3.size()!=3){
+    
+    def getByCode(String code) {
+        // ../CoreQueries/orgUnitType/get?code=BoD
+        if (code==null){
             response.status = 400 // 400 Bad Request
-            def answer = ["error":["status":"400", "expectedParams":"$iso3"]]
+            def answer = ["error":["status":"400", "expectedParams":"String code"]]
             render answer as JSON
         }
         else {
-            def uri = "/currency/get?iso3="+ iso3.toUpperCase()  //internal requestt to domains
+            def uri = "/orgUnitType/getByCode?code="+ code.toUpperCase()  //internal requestt to domains
             params.sourceComponent="Commons"
             params.sourceURI="$uri" 
             params.URL =  RenderService.URL(request) 
-            params.URL += "?iso3="+ iso3.toUpperCase()
+            params.URL += "?code="+ code.toUpperCase()
+//            params.caller = "$request.forwardURI" 
             render RenderService.serviceMethod(params) 
             }
-        }     
+        }  
         
     def shortList() {
-        // ../CoreQueries/currency/shortList
+        // ../CoreQueries/orgUnitType/shortList
         //params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + RenderService.AppName(request) + "/$controllerName"  
         params.URL =  RenderService.URL(request) 
         params.sourceComponent="Commons"
-        params.sourceURI="/currency/shortList"
+        params.sourceURI="/orgUnitType/shortList"
 //        params.caller = "$request.forwardURI" 
         render RenderService.serviceMethod(params)       
         }     
         
     def list() {
-        // ../currency/list
+        // ../orgUnitType/list
         params.sourceComponent="Commons"
         params.URL =  RenderService.URL(request) 
-        params.sourceURI="/currency/index.json"
+        params.sourceURI="/orgUnitType/index.json"
 //        params.caller = "$request.forwardURI" 
         render RenderService.serviceMethod(params)        
         }      
+
 }

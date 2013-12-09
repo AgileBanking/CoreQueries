@@ -11,6 +11,9 @@
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
+//User dfined properties
+custome.auditdb.isOn = false
+
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
@@ -28,6 +31,16 @@ grails.mime.types = [
     text:          'text/plain',
     xml:           ['text/xml', 'application/xml']
 ]
+
+// Include version for JSON generated output.
+//grails.converters.json.domain.include.version = true
+ 
+// Include version for XML generated output.
+//grails.converters.xml.domain.include.version = true
+ 
+// Include version for both XML and JSON output.
+grails.converters.domain.include.version = true
+
 
 // URL Mapping Cache Max Size, defaults to 5000
 //grails.urlmapping.cache.maxsize = 1000

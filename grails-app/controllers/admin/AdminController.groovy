@@ -3,7 +3,7 @@ import grails.converters.*
 import groovy.json.*
 import groovy.xml.MarkupBuilder
 import grails.plugins.rest.client.RestBuilder
-//import groovyx.net.http.*
+import grails.web.Action
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
@@ -50,25 +50,55 @@ class AdminController {
     }
     
     def relationsDiagram(String ComponentName)  {
-        if (ComponentName == "Core" || ComponentName==null) {
-            def url = "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/"
-            url += "[CoreQueries]<>1-0..*>[Accounts], [CoreQueries]<>1-0..*>[Commons], [CoreQueries]<>1-0..*>[Parties], [CoreQueries]<>1-0..*>[Products],[CoreQueries]<>1-0..*>[API Repository],"
-            url += "[CoreUpdates]<>1-0..*>[Accounts], [CoreUpdates]<>1-0..*>[Commons], [CoreUpdates]<>1-0..*>[Parties], [CoreUpdates]<>1-0..*>[Products],[CoreUpdates]<>1-0..*>[API Repository],"       
-            redirect (url:"$url")
-            return
+        // check if internet connection is available
+        URL html = new URL('http://yuml.me');
+        URLConnection urlConnection = html.openConnection();
+        try {
+            urlConnection.connect()
         }
-        else {
-            def component = entities.Component.findByName(ComponentName) 
-            if (component.supportAdmin){
-                def baseURL = component.baseURL
-                redirect (url: "$baseURL" + "/admin/relationsDiagram")
+        catch(e1) {
+            println e1.message
+        }
+        // if there is internet connection ask yUML.me to draw the diagram, else use the local image
+        if (urlConnection.connected) {        
+            if (ComponentName == "Core" || ComponentName==null) {
+                def url = "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/" 
+                url += "[Clients]<>*-0..*>[CoreQueries],[Clients]<>*-0..*>[CoreUpdates], [CoreQueries]<>1-0..*>[Accounts], [CoreQueries]<>1-0..*>[Commons], [CoreQueries]<>1-0..*>[Parties], [CoreQueries]<>1-0..*>[Products],[CoreQueries]<>1-0..*>[API Repository],"
+                url += "[CoreUpdates]<>1-0..*>[Accounts], [CoreUpdates]<>1-0..*>[Commons], [CoreUpdates]<>1-0..*>[Parties], [CoreUpdates]<>1-0..*>[Products],[CoreUpdates]<>1-0..*>[API Repository],"       
+                redirect (url:"$url")
                 return
             }
             else {
-                response.status = 404
-                render "<p>'$ComponentName' does not suport Remote Admin.</p><p> Ask the Relations Diagram from the component, directly.</p>"
+                def component = entities.Component.findByName(ComponentName) 
+                if (component.supportAdmin){
+                    def baseURL = component.baseURL
+                    redirect (url: "$baseURL" + "/admin/relationsDiagram")
+                    return
+                }
+                else {
+                    response.status = 404
+                    render "<p>'$ComponentName' does not suport Remote Admin.</p><p> Ask the Relations Diagram from the component, directly.</p>"
+                }
             }
         }
+        else {
+            // Show the local diagram
+            def reldiagram = """
+                <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+                <html>
+                <head>
+                  <meta content="text/html; charset=ISO-8859-1"
+                 http-equiv="content-type">
+                  <title></title>
+                </head>
+                <body>\n\
+                <img src="${resource(dir: 'images', file: 'RelationsDiagram.png')}" 
+                     alt="Relations Diagram of Commons entites "/><br>
+                </body>
+                </html>
+            """ 
+            render (reldiagram)
+        }            
     }   
     
     def componentsActionsByController(String ComponentName, String ControllerName) {
@@ -102,44 +132,34 @@ class AdminController {
         
     }
     
+
     private myActions()  {
-        def str 
-        def fullName
-        def actionURI
-        def actions = []
         def componentName = grailsApplication.metadata['app.name']
         def jactions = new JsonBuilder()
-        def controllers = grailsApplication.controllerClasses  //grailsApplication.getArtefacts("Controller")   // 
-//        println "controllers: " + controllers.toString()
+//        println "$componentName"
         jactions."$componentName"{
-        controllers.each { c ->    
-//            println "c> $c"
-//            println c.getClass()
-            fullName = c.fullName
-            fullName = fullName.substring(fullName.lastIndexOf('.')+1) - "Controller"
-//            println "$fullName contains 'grails'? " + fullName.contains("grails")
-//            println "c: $fullName c.name=$c.name" 
-            if (!c.fullName.contains("grails") ){
-                "$fullName" { 
-//                    println "set actions of $c.name to: " + c.getURIs().collect({ uri -> c.getMethodActionName(uri)}).unique().sort() - "index"
-                    actions=c.getURIs().collect({ uri -> c.getMethodActionName(uri)}).unique().sort() // - "index"
-//                    println "actions: " + actions
-                    actions.each { a ->
-//                        println "a: $a"
-//                        if ("$a"==defaultAction) {
-//                            "$a" "defaultAction"}
-//                        else {
-                            "$a" "/$c.name/$a"
-//                        }
+            grailsApplication.controllerClasses.each {cc ->    
+            String controller = cc.logicalPropertyName
+//            println "  $controller"
+            "$controller" {
+//                println "      actions:"
+                cc.clazz.methods.each { m->
+                    String action = m.name 
+//                    println "    $action" 
+                    def ann = m.getAnnotation(Action)
+                    if (ann) { 
+                        Class[] argTypes = ann.commandObjects()
+//                        println "$action  ${controller}.$action(${argTypes*.name.join(', ')})"
+                           "$action" "${controller}.$action(${argTypes*.name.join(', ')})"
                     }
                 }
-            }
-         }
-     }
-     render jactions.toPrettyString()
-  }
-
-    def DataModelInJSON = {
+             }
+          }
+       }   
+       render jactions.toPrettyString()
+    }
+   
+    def DataModelInJSON() {
         redirect (action:"JSD", params:params)
         return
     }
@@ -170,7 +190,6 @@ class AdminController {
                                            minOccurs "0" 
                                            maxOccurs "unbounded"                                       
                                        }
-
                                     }  
                                 }
                             }

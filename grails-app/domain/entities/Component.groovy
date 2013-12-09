@@ -1,5 +1,5 @@
 package entities
-
+import grails.plugins.rest.client.RestBuilder
 class Component {   
     String      name
     String      appVersion
@@ -29,5 +29,8 @@ class Component {
         // remove unwanted slash from the end of URL
         baseURL= baseURL.trim()
         if (baseURL[-1]=="/") { baseURL=baseURL[0..baseURL.size()-2]}
+        if (name=="Auditor" && !grailsApplication.config.custome.auditdb.isOn) {
+            println "auditdb is not accessible."
+        }
     }
 }
