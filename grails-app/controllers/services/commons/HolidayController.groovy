@@ -1,12 +1,10 @@
-package services
-
+package services.commons
 import grails.converters.JSON
-
-class IbanController {
+class HolidayController {
 
     static allowedMethods = [
         get: "GET",
-        getByCountryIso2:'GET', 
+        getByIso3:'GET', 
         shortList:'GET', 
         list:'GET']
         
@@ -15,14 +13,14 @@ class IbanController {
     def RenderService
     
     def get(Long id) {
-        // ../CoreQueries/Iban/get?id=1
-        if (id==null ) {
+        // ../CoreQueries/holiday/get?id=1
+        if (pid==null ) {
             response.status = 400 // 400 Bad Request
             def answer = ["error":["status":"400", "id":"$id"]]
             render answer as JSON
         }
         else {
-            def uri = "/Iban/show/$id" + ".json" //internal request to domains
+            def uri = "/holiday/show/$id" + ".json" //internal requestt to domains
             params.sourceComponent="Commons"
             params.sourceURI="$uri" 
             params.URL =  RenderService.URL(request) 
@@ -31,15 +29,17 @@ class IbanController {
             }
         }
         
-    def getByCountryIso2(String iso2) {
-        // ../CoreQueries/Iban/getByIso2?iso3=EUR
-        if (iso2==null || iso2.size()!=2){
+    def getByIso3(String iso3) {
+        // ../CoreQueries/holiday/get?iso3=EUR
+        println "iso3:: $iso3"
+        if (iso3==null || iso3.size()!=3){
             response.status = 400 // 400 Bad Request
-            def answer = ["error":["status":"400", "expectedParams":"String iso2"]]
+            def answer = ["error":["status":"400", "expectedParams":"String iso3"]]
             render answer as JSON
         }
         else {
-            def uri = "/Iban/getByIso2?iso2="+ iso2.toUpperCase()  //internal requestt to domains
+            def uri = "/holiday/getByCountryIso3?iso3="+ iso3.toUpperCase()  //internal requestt to domains
+            println uri
             params.sourceComponent="Commons"
             params.sourceURI="$uri" 
             params.URL =  RenderService.URL(request) 
@@ -50,22 +50,21 @@ class IbanController {
         }  
         
     def shortList() {
-        // ../CoreQueries/Iban/shortList
+        // ../CoreQueries/holiday/shortList
         //params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + RenderService.AppName(request) + "/$controllerName"  
         params.URL =  RenderService.URL(request) 
         params.sourceComponent="Commons"
-        params.sourceURI="/Iban/shortList"
+        params.sourceURI="/holiday/shortList"
 //        params.caller = "$request.forwardURI" 
         render RenderService.serviceMethod(params)       
         }     
         
     def list() {
-        // ../Iban/list
+        // ../holiday/list
         params.sourceComponent="Commons"
         params.URL =  RenderService.URL(request) 
-        params.sourceURI="/Iban/index.json"
+        params.sourceURI="/holiday/index.json"
 //        params.caller = "$request.forwardURI" 
         render RenderService.serviceMethod(params)        
         }      
-
 }

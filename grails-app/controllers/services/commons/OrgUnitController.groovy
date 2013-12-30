@@ -1,4 +1,4 @@
-package services
+package services.commons
 import grails.converters.JSON
 class OrgUnitController {
 

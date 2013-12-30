@@ -1,6 +1,4 @@
-package services
-
-
+package services.commons
 
 import grails.test.mixin.*
 import org.junit.*

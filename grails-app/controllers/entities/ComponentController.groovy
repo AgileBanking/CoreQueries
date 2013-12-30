@@ -1,7 +1,5 @@
 package entities
 
-
-
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.*
 

@@ -1,10 +1,12 @@
-package services
+package services.commons
+
 import grails.converters.JSON
-class HolidayController {
+
+class IbanController {
 
     static allowedMethods = [
         get: "GET",
-        getByIso3:'GET', 
+        getByCountryIso2:'GET', 
         shortList:'GET', 
         list:'GET']
         
@@ -13,14 +15,14 @@ class HolidayController {
     def RenderService
     
     def get(Long id) {
-        // ../CoreQueries/holiday/get?id=1
-        if (pid==null ) {
+        // ../CoreQueries/Iban/get?id=1
+        if (id==null ) {
             response.status = 400 // 400 Bad Request
             def answer = ["error":["status":"400", "id":"$id"]]
             render answer as JSON
         }
         else {
-            def uri = "/holiday/show/$id" + ".json" //internal requestt to domains
+            def uri = "/Iban/show/$id" + ".json" //internal request to domains
             params.sourceComponent="Commons"
             params.sourceURI="$uri" 
             params.URL =  RenderService.URL(request) 
@@ -29,17 +31,15 @@ class HolidayController {
             }
         }
         
-    def getByIso3(String iso3) {
-        // ../CoreQueries/holiday/get?iso3=EUR
-        println "iso3:: $iso3"
-        if (iso3==null || iso3.size()!=3){
+    def getByCountryIso2(String iso2) {
+        // ../CoreQueries/Iban/getByIso2?iso3=EUR
+        if (iso2==null || iso2.size()!=2){
             response.status = 400 // 400 Bad Request
-            def answer = ["error":["status":"400", "expectedParams":"String iso3"]]
+            def answer = ["error":["status":"400", "expectedParams":"String iso2"]]
             render answer as JSON
         }
         else {
-            def uri = "/holiday/getByCountryIso3?iso3="+ iso3.toUpperCase()  //internal requestt to domains
-            println uri
+            def uri = "/Iban/getByIso2?iso2="+ iso2.toUpperCase()  //internal requestt to domains
             params.sourceComponent="Commons"
             params.sourceURI="$uri" 
             params.URL =  RenderService.URL(request) 
@@ -50,21 +50,22 @@ class HolidayController {
         }  
         
     def shortList() {
-        // ../CoreQueries/holiday/shortList
+        // ../CoreQueries/Iban/shortList
         //params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + RenderService.AppName(request) + "/$controllerName"  
         params.URL =  RenderService.URL(request) 
         params.sourceComponent="Commons"
-        params.sourceURI="/holiday/shortList"
+        params.sourceURI="/Iban/shortList"
 //        params.caller = "$request.forwardURI" 
         render RenderService.serviceMethod(params)       
         }     
         
     def list() {
-        // ../holiday/list
+        // ../Iban/list
         params.sourceComponent="Commons"
         params.URL =  RenderService.URL(request) 
-        params.sourceURI="/holiday/index.json"
+        params.sourceURI="/Iban/index.json"
 //        params.caller = "$request.forwardURI" 
         render RenderService.serviceMethod(params)        
         }      
+
 }

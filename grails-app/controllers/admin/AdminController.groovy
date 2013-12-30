@@ -24,9 +24,10 @@ class AdminController {
               <title>admin</title>
             </head>
             <body>
-            <div style="text-align: left;"><big
-             style="color: rgb(12, 59, 150);"><big><big><span
-             style="font-family: Calibri; font-weight: bold;">Admin menu</span></big></big></big><br>
+            <div style="text-align: left;">\n\
+                <big style="color: rgb(12, 59, 150);"><big><big>\n\
+                <span style="font-family: Calibri; font-weight: bold;">CORE PARTIES<br></span>\n\
+                <span style="font-family: Calibri;">Admin menu</span></big></big></big><br>
             </div>
             <br>
             <ol>
@@ -63,8 +64,8 @@ class AdminController {
         if (urlConnection.connected) {        
             if (ComponentName == "Core" || ComponentName==null) {
                 def url = "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/" 
-                url += "[Clients]<>*-0..*>[CoreQueries],[Clients]<>*-0..*>[CoreUpdates], [CoreQueries]<>1-0..*>[Accounts], [CoreQueries]<>1-0..*>[Commons], [CoreQueries]<>1-0..*>[Parties], [CoreQueries]<>1-0..*>[Products],[CoreQueries]<>1-0..*>[API Repository],"
-                url += "[CoreUpdates]<>1-0..*>[Accounts], [CoreUpdates]<>1-0..*>[Commons], [CoreUpdates]<>1-0..*>[Parties], [CoreUpdates]<>1-0..*>[Products],[CoreUpdates]<>1-0..*>[API Repository],"       
+                url += "[Clients]<>0..*-0..*>[CoreQueries],[Clients]<>0..*-0..*>[CoreUpdates], [CoreQueries]<>0..*-0..*>[Accounts], [CoreQueries]<>0..*-0..*>[Commons], [CoreQueries]<>0..*-0..*>[Parties], [CoreQueries]<>0..*-0..*>[Products],[CoreQueries]<>0..*-0..*>[API Repository],"
+                url += "[CoreUpdates]<>0..*-0..*>[Accounts], [CoreUpdates]<>0..*-0..*>[Commons], [CoreUpdates]<>0..*-0..*>[Parties], [CoreUpdates]<>0..*-0..*>[Products],[CoreUpdates]<>0..*-0..*>[API Repository],"       
                 redirect (url:"$url")
                 return
             }
@@ -131,7 +132,6 @@ class AdminController {
         }
         
     }
-    
 
     private myActions()  {
         def componentName = grailsApplication.metadata['app.name']
@@ -149,8 +149,10 @@ class AdminController {
                     def ann = m.getAnnotation(Action)
                     if (ann) { 
                         Class[] argTypes = ann.commandObjects()
-//                        println "$action  ${controller}.$action(${argTypes*.name.join(', ')})"
+//                      // exclude index
+                        if ("$action"!="index") {
                            "$action" "${controller}.$action(${argTypes*.name.join(', ')})"
+                        }
                     }
                 }
              }

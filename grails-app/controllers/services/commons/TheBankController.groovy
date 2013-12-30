@@ -1,4 +1,4 @@
-package services
+package services.commons
 import grails.converters.deep.JSON
 
 class TheBankController {

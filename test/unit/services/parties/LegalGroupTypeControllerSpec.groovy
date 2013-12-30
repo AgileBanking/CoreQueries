@@ -1,4 +1,4 @@
-package services
+package services.parties
 
 
 
@@ -8,8 +8,8 @@ import org.junit.*
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
-@TestFor(OrgUnitTypeController)
-class OrgUnitTypeControllerSpec {
+@TestFor(LegalGroupTypeController)
+class LegalGroupTypeControllerSpec {
 
     void testSomething() {
        fail "Implement me"
