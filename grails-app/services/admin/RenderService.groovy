@@ -10,10 +10,13 @@ class RenderService {
         def baseURL = comp1.baseURL  
         params.reqID = UUID.randomUUID().toString()
         params.timestamp = new Date().toString()
-        
-        if (params.links == null) { params.links = []}
-        params.links += ["rel": "self", "href": "$params.URL"]
+        // prepare hyperlinks
+        def links = ["self": ["href": "$params.URL"]]
+        if (params.links != null) { links += params.links}
+        // clean params
+        params.remove("links")
         params.remove("URL")
+        // define variables
         def answer = ""
         def xref = ""
         def resp 
@@ -53,15 +56,16 @@ class RenderService {
         } 
         catch(Exception e2) {
             return [error:"$e2.message" ] as JSON 
-        }
-        answer = ["header":params, "body":resp.json]
+        }       
+        answer = ["header":params, "links": links, "body":resp.json]
+        
         // Keep Audit in CouchDB
         try {
             if (entities.Component.findByName("Auditor").isActive) {
                 // store in the auditdb (CouchDB)
                 def restAudit = new RestBuilder()
                 def url = entities.Component.findByName("Auditor").baseURL + "/$params.reqID"
-                params.links += ["rel": "audit", "href" : "$url" ]
+                answer.links += ["audit":["href" : "$url"]]
 //                answer.header.auditRec = "$url"
                 def respAudit = restAudit.put("$url"){
                     contentType "application/json"
@@ -69,9 +73,8 @@ class RenderService {
                 }
             }            
         }
-        catch(Exception e) {
-//            answer.header.auditDB="unavailable"
-            header.header.error="$e.message" 
+        catch(Exception e3) {
+            answer.header.error="$e3.message" 
         }
         
         return answer as JSON      

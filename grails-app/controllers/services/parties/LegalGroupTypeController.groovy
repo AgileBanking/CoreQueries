@@ -9,6 +9,11 @@ class LegalGroupTypeController {
     
     def RenderService
 
+    def schema() {
+        def link = ["LegalGroupType":["schema": ["href":RenderService.host(request) + "/admin/JSD?ComponentName=Parties&ClassName=LegalGroupType"]]]
+        render link as JSON
+    }
+    
     def get(Long id) {
         // ../CoreQueries/legalGroupType/get?id=10
         if (params.id==null ) {
@@ -21,9 +26,9 @@ class LegalGroupTypeController {
             params.sourceComponent="Parties"
             params.collection = false
             params.hostApp = RenderService.host(request) 
-            params.links = [
-                ["rel":"myLegalGroups", "href": "$params.hostApp/legalGroupType/listMyLegalGroups?id=$id"]
-            ]
+            params.links  = ["schema": ["href":RenderService.host(request) + \
+                            "/admin/JSD?ComponentName=$params.sourceComponent&ClassName=LegalGroupType"]]
+            params.links += ["myLegalGroups":[ "href": "$params.hostApp/legalGroupType/listMyLegalGroups?id=$id"]]
             params.sourceURI="$uri"  
             params.hideclass = true
             params.URL =  RenderService.URL(request) 
@@ -57,6 +62,7 @@ class LegalGroupTypeController {
         params.sourceComponent="Parties"
         params.collection = true
         params.hostApp = RenderService.host(request)
+        params.links = ["getLegalGroup":[ "template": true, "fields": "id", "href": "$params.hostApp/legalGroup/get?id={id}"]]        
         params.URL =  RenderService.URL(request) 
         params.hideclass = true
         params.sourceURI="/legalGroupType/index.json"
