@@ -6,11 +6,10 @@ class RenderService {
     static transactional = false
     
     def serviceMethod(params) {
-        def comp1 = entities.Component.findByName(params.sourceComponent)
-        def baseURL = comp1.baseURL  
+        def baseURL = entities.Component.findByName(params.sourceComponent).baseURL
         params.reqID = UUID.randomUUID().toString()
         params.timestamp = new Date().toString()
-        // prepare hyperlinks
+        // prepare hyperlinks    
         def links = ["self": ["href": "$params.URL"]]
         if (params.links != null) { links += params.links}
         // clean params
@@ -21,43 +20,35 @@ class RenderService {
         def xref = ""
         def resp 
         def rest = new RestBuilder()
-        try {
+        def s
+        try {        
             resp = rest.get("$baseURL$params.sourceURI") { 
                 accept "application/json"
                 contentType "application/json"
                 } 
-            if (resp.json.class) {
-                resp.json.remove("class")
+            params.status = resp.status.toString() 
+            if (resp.status < 300 && resp.json.class != null) { 
+                resp.json.remove("class") 
             }
-            try {                
-                resp.json.each {
-//                    println "$it" 
-                    if (params.hideclass==null || params.hideclass){
-                        it.remove("class") 
-                    }
-//                    xref = "$it".split("=")[0]
-//                    println "$xref" 
-//                    if (params.ref.get(xref)) {
-//                        if (params.ref.get(xref) == "1") {
-//                            params.links += ["rel": "$xref", "href" : "$params.serviceURL/$xref/get?id=" + resp.json."$xref".id ]
-//                        }
-//                    } 
-                }              
+            if (params.hide) {
+                params.hide.each {
+                    resp.json.remove("$it")
+                }
+                params.remove("hide")
             }
-            catch(Exception e1) {}
-//                // Build references (HATEOAS)
-//                if (params.ref) {
-//                    params.ref.each {
-//                      ref = "/$it/get?id=" + resp.json."$it".id 
-//                        params.links += ["rel": "$it", "href": "/$it/get?id=1" ]
-//                    }                                
-//                }
-
         } 
         catch(Exception e2) {
-            return [error:"$e2.message" ] as JSON 
+            return [error:"error# 100, $resp.status, $e2.message, $baseURL$params.sourceURI" ] as JSON 
         }       
-        answer = ["header":params, "links": links, "body":resp.json]
+
+        if (params.withlinks == "false" ) {
+            params.notes = "To show 'links' include in the headers or in request 'withlinks=true'."
+            answer = ["header":params, "body":resp.json]
+        }
+        else {
+            params.notes = "To hide 'links' include in the headers or in request 'withlinks=false'."
+            answer = ["header":params, "links": links, "body":resp.json]
+        }
         
         // Keep Audit in CouchDB
         try {
@@ -85,7 +76,7 @@ class RenderService {
         return x.substring(0,x.indexOf('.dispatch')) - '/grails'	        
     }   
     
-    def host(request) {
+    def hostApp(request) {
         def appName = "CoreQueries" 
         def x = request.getRequestURL() 
         return x.substring(0,x.indexOf("$appName") + appName.size())  
