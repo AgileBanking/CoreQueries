@@ -10,7 +10,14 @@ class RenderService {
         params.reqID = UUID.randomUUID().toString()
         params.timestamp = new Date().toString()
         // prepare hyperlinks    
+        def href = "$params.URL"
         def links = ["self": ["href": "$params.URL"]]
+        if (href.contains("?")) {
+            links.self += ["alt_href": "$href" + "&withlinks=false"]
+        }
+        else {
+            links.self += ["alt_href": "$href" + "?withlinks=false"]
+        }
         if (params.links != null) { links += params.links}
         // clean params
         params.remove("links")

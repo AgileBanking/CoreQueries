@@ -4,12 +4,12 @@ import grails.plugins.rest.client.RestBuilder
 
 class LegalGroupTypeController {
     static allowedMethods = [
-        index: "GET",
-        get: "GET", 
-        schema: "GET",
-        create: "GET",
-        listMyLegalGroups: "GET",
-        list:'GET']
+        index:              "GET",
+        get:                "GET", 
+        schema:             "GET",
+        create:             "GET",
+        listMyLegalGroups:  "GET",
+        list:               "GET"]
         
     def index() { redirect(action: "list", params: params) }
     
@@ -24,15 +24,7 @@ class LegalGroupTypeController {
         params.sourceURI="$uri"  
         params.hideclass = true
         params.URL =  RenderService.URL(request) 
-        if (params.withlinks==null) { params.withlinks = request.getHeader('withlinks')}
-        if (params.withlinks=="true" || params.withlinks==null ) { 
-            params.links  = ["list":["template": true, "fields": ["max"], "href":"$params.hostApp/legalGroupType/list", "description":"List " ]]
-            params.links += ["get":["template": true, "fields": ["id"], "href": "$params.hostApp/legalGroupType/get?id={id}"]]
-            params.links += ["save":["template":true, "method":"PUT", "href": entities.Component.findByName('CoreUpdates').baseURL + "/legalGroupType/save", \
-                "body":"@create", "notes":"If you have not in cache, get the body from the 'create'."]]
-            params.links += ["create": ["href": "$params.hostApp/legalGroupType/create", "notes":"Returns an empty instance of editable fields."]]
-            params.links += ["myLegalGroups":["template": true, "fields": ["id"],"href": "$params.hostApp/legalGroupType/listMyLegalGroups?id={id}"]]
-        }        
+        includeLinks(params)      
         render RenderService.serviceMethod(params)
     }
     
@@ -42,16 +34,7 @@ class LegalGroupTypeController {
         params.collection = false
         params.hostApp = RenderService.hostApp(request) 
         params.URL =  RenderService.URL(request) 
-        if (params.withlinks==null) { params.withlinks = request.getHeader('withlinks')}    
-        if (params.withlinks=="true" || params.withlinks==null ) {         
-            params.links  = ["get":["template": true, "fields": "id", "href": "$params.hostApp/legalGroupType/get?id={id}"]]
-            params.links += ["list": ["href": "$params.hostApp/legalGroupType/list"]]
-            params.links += ["schema": ["href": "$params.hostApp/legalGroupType/schema"]]
-            params.links += ["save":["template":true, "method":"PUT", "href": entities.Component.findByName('CoreUpdates').baseURL + "/legalGroupType/save", \
-                "body":"@create", "notes":"If you have not in cache, get the body from the 'create'."]]
-            params.links += ["create": ["href": "$params.hostApp/legalGroupType/create"]]        
-            params.links += ["myLegalGroups":["template": true, "fields": "id","href": "$params.hostApp/legalGroupType/listMyLegalGroups?id={id}"]]
-        }
+        includeLinks(params)
         params.hide = ["id", "version"]
         params.sourceURI = "$uri"  
         params.hideclass = true
@@ -68,20 +51,11 @@ class LegalGroupTypeController {
             render answer as JSON
         }
         else {
-            println "id=$id"
             def uri = "/legalGroupType/show/$id" + ".json" //internal request to domains
             params.sourceComponent="Parties"
             params.collection = false
             params.hostApp = RenderService.hostApp(request) 
-            if (params.withlinks==null) { params.withlinks = request.getHeader('withlinks')}    
-            if (params.withlinks=="true" || params.withlinks==null ) { 
-                params.links  = ["list": ["href": "$params.hostApp/legalGroupType/list"]]
-                params.links += ["get":["template": true, "fields": "id", "href": "$params.hostApp/legalGroupType/get?id={id}"]]
-                params.links += ["save":["template":true, "method":"PUT", "href": entities.Component.findByName('CoreUpdates').baseURL + "/legalGroupType/save", \
-                    "body":"@create", "notes":"If you have not in cache, get the body from the 'create'."]]
-                params.links += ["create": ["href": "$params.hostApp/legalGroupType/create"]]            
-                params.links += ["myLegalGroups":["href": "$params.hostApp/legalGroupType/listMyLegalGroups?id=$id"]]
-            }
+            includeLinks(params)
             params.sourceURI = uri
             params.hideclass = true
             params.URL =  RenderService.URL(request) 
@@ -104,6 +78,7 @@ class LegalGroupTypeController {
             params.sourceURI="$uri" 
             params.hideclass = true
             params.hostApp = RenderService.hostApp(request)
+            includeLinks(params)
             params.URL =  RenderService.URL(request) 
             params.URL += "?id=$id"
             render RenderService.serviceMethod(params) 
@@ -115,19 +90,38 @@ class LegalGroupTypeController {
         params.sourceComponent="Parties"
         params.collection = true
         params.hostApp = RenderService.hostApp(request)
-        if (params.withlinks==null) { params.withlinks = request.getHeader('withlinks')}    
-        if (params.withlinks=="true" || params.withlinks==null ) {         
-            params.links  = ["schema": ["href":params.hostApp + \
-                                "/admin/JSD?ComponentName=$params.sourceComponent&ClassName=LegalGroupType"]]  
-            params.links += ["save":["template":true, "method":"PUT", "href": entities.Component.findByName('CoreUpdates').baseURL + "/legalGroupType/save", \
-                "body":"@create", "notes":"If you have not in cache, get the body from the 'create'."]]                                        
-            params.links += ["create":["href": "$params.hostApp/legalGroupType/create"]]   
-            params.links += ["get":["template": true, "fields": "id", "href": "$params.hostApp/legalGroupType/get?id={id}"]]
-            params.links += ["getLegalGroup":["template": true, "fields": "id", "href": "$params.hostApp/legalGroup/get?id={id}"]]        
-        }
+        includeLinks(params)
         params.URL =  RenderService.URL(request) 
         params.hideclass = true
         params.sourceURI="/legalGroupType/index.json"
         render RenderService.serviceMethod(params)        
         }      
+    
+    def relatedLinks() {
+        params.hostApp = RenderService.hostApp(request)
+        includeLinks(params)
+        def result = [:]
+        result.controller = "legalGroupType"
+        params.links += ["self": ["href": "$params.hostApp/$result.controller/relatedLinks"]]
+        result.links= params.links
+        render result as JSON
+    }
+    private includeLinks(params) {
+        if (params.withlinks==null) { params.withlinks = request.getHeader('withlinks')}
+        if (params.withlinks=="true" || params.withlinks==null ) { 
+            params.links  = ["list":["template": true, "fields": ["max"], "href":"$params.hostApp/legalGroupType/list", "description":"List " ]]
+            params.links += ["get":["template": true, "fields": ["id"], "href": "$params.hostApp/legalGroupType/get?id={id}"]]
+            params.links += ["schema": ["href": "$params.hostApp/legalGroupType/schema"]]
+            params.links += ["create": ["href": "$params.hostApp/legalGroupType/create", "notes":"Returns an empty instance of editable fields."]]
+            params.links += ["save":["template":true, "method":"PUT", "href": entities.Component.findByName('CoreUpdates').baseURL + "/legalGroupType/save", \
+                "body":"@create", "notes":"If you have not in cache, get the body from the 'create'."]]
+            if (params.id==null) {
+                params.links += ["myLegalGroups":["template": true, "fields": "id","href": "$params.hostApp/legalGroupType/listMyLegalGroups?id={id}"]]           
+            }
+            else {
+                params.links += ["myLegalGroups":["href": "$params.hostApp/legalGroupType/listMyLegalGroups?id=$params.id"]]            
+            }
+
+        }        
+    }
 }
