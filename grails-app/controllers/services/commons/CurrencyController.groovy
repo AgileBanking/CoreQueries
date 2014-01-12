@@ -2,37 +2,10 @@ package services.commons
 
 import grails.converters.JSON
 
-class CurrencyController {
-//    LinkGenerator grailsLinkGenerator
-//    def components = ConfigurationHolder.config.app.components
-
-    static allowedMethods = [
-        get: "GET",
-        getByIso3:'GET', 
-        shortList:'GET', 
-        list:'GET']
-        
-    def index() { redirect(action: "shortList", params: params) }
+class CurrencyController extends BaseController {
+    def XRenderService        
+    def XBuildLinksService
     
-    def RenderService
-    
-    def get(Long id) {
-        // ../CoreQueries/currency/get?id=1
-        if (id==null ) {
-            response.status = 400 // 400 Bad Request
-            def answer = ["error":["status":"400", "id":"$id"]]
-            render answer as JSON
-        }
-        else {
-            def uri = "/currency/show/$id" + ".json" //internal request to domains
-            params.sourceComponent="Commons"
-            params.sourceURI="$uri" 
-            params.URL =  RenderService.URL(request) 
-            params.URL += "?id=$id"
-            render RenderService.serviceMethod(params) 
-            }
-        }  
-        
     def getByIso3(String iso3) {
         // ../CoreQueries/currency/get?iso3=EUR
         if (iso3==null || iso3.size()!=3){
@@ -41,31 +14,34 @@ class CurrencyController {
             render answer as JSON
         }
         else {
-            def uri = "/currency/get?iso3="+ iso3.toUpperCase()  //internal requestt to domains
+            def uri = "/currency/getByIso3?iso3="+ iso3.toUpperCase()  //internal requestt to domains
             params.sourceComponent="Commons"
             params.sourceURI="$uri" 
-            params.URL =  RenderService.URL(request) 
+            params.hostApp = XRenderService.hostApp(request)
+            params.URL =  XRenderService.URL(request) 
             params.URL += "?iso3="+ iso3.toUpperCase()
-            render RenderService.serviceMethod(params) 
+            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links += extraLinks("$params.hostApp/$params.controller")
+            render XRenderService.serviceMethod(params, request) 
             }
         }     
         
     def shortList() {
         // ../CoreQueries/currency/shortList
         //params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + RenderService.AppName(request) + "/$controllerName"  
-        params.URL =  RenderService.URL(request) 
+        params.URL =  XRenderService.URL(request) 
         params.sourceComponent="Commons"
+        params.hostApp = XRenderService.hostApp(request)
         params.sourceURI="/currency/shortList"
-//        params.caller = "$request.forwardURI" 
-        render RenderService.serviceMethod(params)       
+        params.links = XBuildLinksService.controllerLinks(params, request)
+        params.links += extraLinks("$params.hostApp/$params.controller")
+        render XRenderService.serviceMethod(params, request)       
         }     
         
-    def list() {
-        // ../currency/list
-        params.sourceComponent="Commons"
-        params.URL =  RenderService.URL(request) 
-        params.sourceURI="/currency/index.json"
-//        params.caller = "$request.forwardURI" 
-        render RenderService.serviceMethod(params)        
-        }      
+    def extraLinks(String controllerURL) { 
+        def links = [:]
+        links += ["shortList": ["href": "$controllerURL/shortList"]]
+        links += ["getByIso3":["template":true, "fields": ["iso3":"String"], "href":  "$controllerURL/getByIso3?iso3={iso3}"]]
+        return links 
+    }     
 }

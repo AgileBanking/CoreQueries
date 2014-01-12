@@ -7,12 +7,14 @@ class ${className}Controller {
         
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
+    def RenderService
+    
     def index() {redirect(action: "list", params: params)}
     
     def schema = {
         withFormat{
-            json {redirect(uri:"/schema/json?class=Currency")}
-            xml  {redirect(uri:"/schema/XSD?class=Currency")}
+            json {redirect(uri:"/schema/json?class=${className}")}
+            xml  {redirect(uri:"/schema/XSD?class=${className}")}
         }
     }    
 
@@ -177,4 +179,61 @@ class ${className}Controller {
             redirect(action: "show", id: id)
         }
     }
+    
+    def relatedLinks() {
+        params.hostApp = RenderService.hostApp(request)
+        includeLinks(params)
+        def result = [:]
+        result.controller = params.controller 
+        params.links += ["self": ["href": "$params.hostApp/$result.controller/relatedLinks"]]
+        result.links= params.links
+        render result as JSON
+    }
+
+    def schema() {
+        def uri = "/admin/JSD?ComponentName=Parties&ClassName=" + params.controller.capitalize() //internal request to domains
+        println uri
+        params.sourceComponent="Parties"
+        params.collection = false
+        params.hostApp = RenderService.hostApp(request) 
+        params.sourceURI="$uri"  
+        params.hideclass = true
+        params.URL =  RenderService.URL(request) 
+        includeLinks(params)      
+        render RenderService.serviceMethod(params)
+    }
+    
+    def create() {
+        def uri = "/$params.controller/create.json" //internal request to domains
+        println uri
+        params.sourceComponent="Parties"
+        params.collection = false
+        params.hostApp = RenderService.hostApp(request) 
+        params.URL =  RenderService.URL(request) 
+        includeLinks(params)
+        params.hide = ["id", "version"]
+        params.sourceURI = "$uri"  
+        params.hideclass = true
+        params.URL =  RenderService.URL(request) 
+        render RenderService.serviceMethod(params)         
+    }
+    
+    private includeLinks(params) {
+        if (params.withlinks==null) { params.withlinks = request.getHeader('withlinks')}
+        if (params.withlinks=="true" || params.withlinks==null ) { 
+            params.links  = ["list":["template": true, "fields": ["max"], "href":"$params.hostApp/$params.controller/list", "description":"List " ]]
+            params.links += ["get":["template": true, "fields": ["id"], "href": "$params.hostApp/$params.controller/get?id={id}"]]
+            params.links += ["schema": ["href": "$params.hostApp/$params.controller/schema"]]
+            params.links += ["create": ["href": "$params.hostApp/$params.controller/create", "notes":"Returns an empty instance of editable fields."]]
+            params.links += ["save":["template":true, "method":"PUT", "href": entities.Component.findByName('CoreUpdates').baseURL + "/$params.controller/save", \
+                "body":"@create", "notes":"If you have not in cache, get the body from the 'create'."]]
+            if (params.id==null) {
+                params.links += ["myLegalGroups":["template": true, "fields": "id","href": "$params.hostApp/$params.controller/listMyLegalGroups?id={id}"]]           
+            }
+            else {
+                params.links += ["myLegalGroups":["href": "$params.hostApp/$params.controller/listMyLegalGroups?id=$params.id"]]            
+            }
+        }        
+    }    
+    
 }

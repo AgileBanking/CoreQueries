@@ -16,36 +16,44 @@ class AdminController {
 
     def menu() { 
     def html = """
-            <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-            <html>
-            <head>
-              <meta content="text/html; charset=ISO-8859-1"
-             http-equiv="content-type">
-              <title>admin</title>
-            </head>
-            <body>
-            <div style="text-align: left;">\n\
-                <big style="color: rgb(12, 59, 150);"><big><big>\n\
-                <span style="font-family: Calibri; font-weight: bold;">CORE PARTIES<br></span>\n\
-                <span style="font-family: Calibri;">Admin menu</span></big></big></big><br>
-            </div>
-            <br>
-            <ol>
-              <li><a href="XSD" target="_blank">Data
-            Model in XML Schema</a></li>
-              <li><a href="JSD" target="_blank">Data
-            Model in JSON Schema</a></li>
-              <li><a href="relationsDiagram" target="_blank">Relations
-            Diagram</a></li>
-              <li><a href="componentsActionsByController" target="_blank">Actions
-            by Controller</a></li>
-            </ol>
-                You can address specific component by appending:<br>
-                ?ComponentName={component}<br>
-                For example, after calling one of the above, append:<br>
-                ?ComponentName=Commons
-            </body>
-            </html>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+        <html>
+        <head>
+          <meta content="text/html; charset=ISO-8859-1"
+         http-equiv="content-type">
+          <title>admin</title>
+        </head>
+        <body>
+        <div style="text-align: left;"><big
+         style="color: rgb(12, 59, 150);"><big><big><span
+         style="font-family: Calibri; font-weight: bold;">CoreQueries<br>
+        </span><span style="font-family: Calibri;">Admin menu</span></big></big></big><br>
+        </div>
+        <br>
+        <ol>
+          <li><a href="XSD" target="_blank">Data
+        Model in XML Schema</a></li>
+          <li><a href="JSD" target="_blank">Data
+        Model in JSON Schema</a></li>
+          <li><a href="relationsDiagram" target="_blank">Relations
+        Diagram</a></li>
+          <ol>
+            <li><a href="relationsDiagram?ComponentName=CoreQueries" target="_blank">CoreLayer</li>
+            <li><a href="relationsDiagram?ComponentName=Commons" target="_blank">Commons</li>
+            <li><a href="relationsDiagram?ComponentName=Parties" target="_blank">Parties</li>
+            <li><a href="relationsDiagram?ComponentName=Products" target="_blank">Products</li>
+            <li><a href="relationsDiagram?ComponentName=Accounts" target="_blank">Accounts</li>\n\
+          </ol>
+          <li><a href="componentsActionsByController"
+         target="_blank">Actions
+        by Controller</a></li>
+        </ol>
+        You can address specific component by appending:<br>
+        ?ComponentName={component}<br>
+        For example, after calling one of the above, append:<br>
+        ?ComponentName=Commons
+        </body>
+        </html>
         """
         render (html)
     }
@@ -64,7 +72,8 @@ class AdminController {
         if (urlConnection.connected) {        
             if (ComponentName == "Core" || ComponentName==null) {
                 def url = "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/" 
-                url += "[Clients]<>0..*-0..*>[CoreQueries],[CoreUpdates]<>0..*-0..*>[CoreQueries],[Clients]<>0..*-0..*>[CoreUpdates], [CoreQueries]<>0..*-0..*>[Accounts], [CoreQueries]<>0..*-0..*>[Commons], [CoreQueries]<>0..*-0..*>[Parties], [CoreQueries]<>0..*-0..*>[Products],[CoreQueries]<>0..*-0..*>[API Repository],"
+//                url += "[Clients]<>0..*-0..*>[CoreQueries],[Clients]<>0..*-0..*>[CoreUpdates], [CoreUpdates]<>0..*-0..*>[CoreQueries],[CoreQueries]<>0..*-0..*>[Accounts], [CoreQueries]<>0..*-0..*>[Commons], [CoreQueries]<>0..*-0..*>[Parties], [CoreQueries]<>0..*-0..*>[Products],[CoreQueries]<>0..*-0..*>[API Repository],"
+                url += "[CoreUpdates]<>0..*-0..*>[CoreQueries],[CoreQueries]<>0..*-0..*>[Accounts], [CoreQueries]<>0..*-0..*>[Commons], [CoreQueries]<>0..*-0..*>[Parties], [CoreQueries]<>0..*-0..*>[Products],[CoreQueries]<>0..*-0..*>[API Repository],"
                 url += "[CoreUpdates]<>0..*-0..*>[Accounts], [CoreUpdates]<>0..*-0..*>[Commons], [CoreUpdates]<>0..*-0..*>[Parties], [CoreUpdates]<>0..*-0..*>[Products],[CoreUpdates]<>0..*-0..*>[API Repository]"       
                 redirect (url:"$url")
                 return
@@ -137,7 +146,13 @@ class AdminController {
         def componentName = grailsApplication.metadata['app.name']
         def jactions = new JsonBuilder()
         jactions."$componentName"{
-            grailsApplication.controllerClasses.each {cc ->    
+            def x = request.getRequestURL() 
+            x = x.substring(0,x.indexOf('.dispatch')) - '/grails' - "/admin/componentsActionsByController" 
+            links {
+                hostApp "$x" 
+                href "$x/home"                
+            }
+            grailsApplication.controllerClasses.each {cc ->   
             String controller = cc.logicalPropertyName
             "$controller" {
                 cc.clazz.methods.each { m->
@@ -146,8 +161,8 @@ class AdminController {
                     if (ann) { 
                         Class[] argTypes = ann.commandObjects()
 //                      // exclude index
-                        if ("$action"!="index") {
-                           "$action" "${controller}.$action(${argTypes*.name.join(', ')})"
+                        if ("$action"!="index") { 
+                           "$action" "/${controller}.$action(${argTypes*.name.join(', ')})"
                         }
                     }
                 }

@@ -1,20 +1,31 @@
 package entities
 
+import static org.springframework.http.HttpStatus.*
+import grails.transaction.Transactional
+import org.codehaus.groovy.grails.web.json.*
 import org.springframework.dao.DataIntegrityViolationException
+
 import grails.converters.*
 
 class ComponentController {
         
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [
+        save: "POST", 
+        update: "POST", 
+        delete: "POST",
+        index: "GET",
+        list: "GET",
+        listMethods: "GET",
+        get: "GET",
+        customeQuery: "GET"
+    ]
 
-    def index() {redirect(action: "list", params: params)}
+    def list() {redirect(action: "index", params: params)}
     
-    def schema = {
-        withFormat{
-            json {redirect(uri:"/schema/json?class=Currency")}
-            xml  {redirect(uri:"/schema/XSD?class=Currency")}
-        }
-    }    
+    def index()  {
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)  
+        respond Component.list(params), model:[componentInstanceTotal: Component.count()]
+    }   
 
     def listMethods = {
         def myMap =[:]
@@ -25,21 +36,11 @@ class ComponentController {
         myMap["Methods"]=myMethods
         withFormat{
             json {render myMap as JSON}
-            xml {render myMap as XML}
+            xml  {render myMap as XML}
         }
     }    
 
 
-    def list = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)  
-//        def result = [ComponentList: Component.list(params)]
-        def result = Component.list(params)
-        withFormat{
-            html { return [componentInstanceList: Component.list(params), componentInstanceTotal: Component.count()]}
-            xml  { render result as XML }
-            json { render result as JSON}
-        }
-    }
 
     def get(Long id) {
         def componentInstance =  Component.get(id)
@@ -61,7 +62,7 @@ class ComponentController {
     }
     
     
-    def customeQuery(String query) {
+    def customQuery(String query) {
         // Example: // customeQuery?query=select iso2, name, nameInt from Language
         def componentInstance =  Component.executeQuery(query)
         if (!componentInstance) {

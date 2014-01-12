@@ -5,7 +5,7 @@ import grails.converters.*
 class RenderService {
     static transactional = false
     
-    def serviceMethod(params) {
+    def serviceMethod(params, request) {
         def baseURL = entities.Component.findByName(params.sourceComponent).baseURL
         params.reqID = UUID.randomUUID().toString()
         params.timestamp = new Date().toString()
@@ -45,7 +45,10 @@ class RenderService {
             }
         } 
         catch(Exception e2) {
-            return [error:"error# 100, $resp.status, $e2.message, $baseURL$params.sourceURI" ] as JSON 
+            //answer = ["status":"$resp.status" , "message": "$e2.message", "sourceURI":"$baseURL$params.sourceURI"]  
+            def xe2 = e2.toString() //.message.split(':')
+            answer = ["message": [xe2]] 
+            return answer as JSON
         }       
 
         if (params.withlinks == "false" ) {
@@ -55,6 +58,7 @@ class RenderService {
         else {
             params.notes = "To hide 'links' include in the headers or in request 'withlinks=false'."
             answer = ["header":params, "links": links, "body":resp.json]
+//            answer = ["header":params, "request": request, "links": links, "body":resp.json]
         }
         
         // Keep Audit in CouchDB
@@ -84,7 +88,7 @@ class RenderService {
     }   
     
     def hostApp(request) {
-        def appName = "CoreQueries" 
+        def appName = entities.Component.findByName("CoreQueries").baseURL 
         def x = request.getRequestURL() 
         return x.substring(0,x.indexOf("$appName") + appName.size())  
     }      

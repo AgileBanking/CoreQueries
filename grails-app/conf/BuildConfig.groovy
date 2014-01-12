@@ -20,6 +20,7 @@ grails.project.fork = [
     // configure settings for the Console UI JVM
     console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
 ]
+//grails.project.docs.output.dir = 'web-app/docs'
 
 grails.project.dependency.resolver = "ivy" // or "maven" 
 grails.project.dependency.resolution = {
