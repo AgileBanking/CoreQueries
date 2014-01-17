@@ -8,7 +8,7 @@ class LegalGroupTypeController {
         get:                "GET", 
         schema:             "GET",
         create:             "GET",
-        listMyLegalGroups:  "GET",
+        myLegalGroups:  "GET",
         list:               "GET"]
         
     def index() { redirect(action: "list", params: params) }
@@ -26,7 +26,7 @@ class LegalGroupTypeController {
             params.sourceComponent="Parties"
             params.collection = false
             params.hostApp = RenderService.hostApp(request) 
-            includeLinks(params)
+            extraLinks(params)
             params.sourceURI = uri
             params.hideclass = true
             params.URL =  RenderService.URL(request) 
@@ -35,7 +35,7 @@ class LegalGroupTypeController {
             }
         } 
           
-    def listMyLegalGroups(Long id) {
+    def myLegalGroups(Long id) {
         if (params.id==null ) {
             response.status = 400 // 400 Bad Request
             def answer = ["error":["status":"400", "id":"$id"]]
@@ -48,7 +48,7 @@ class LegalGroupTypeController {
             params.sourceURI="$uri" 
             params.hideclass = true
             params.hostApp = RenderService.hostApp(request)
-            includeLinks(params)
+            extraLinks(params)
             params.URL =  RenderService.URL(request) 
             params.URL += "?id=$id"
             render RenderService.serviceMethod(params) 
@@ -59,7 +59,7 @@ class LegalGroupTypeController {
         params.sourceComponent="Parties"
         params.collection = true
         params.hostApp = RenderService.hostApp(request)
-        includeLinks(params)
+        extraLinks(params)
         params.URL =  RenderService.URL(request) 
         params.hideclass = true
         params.sourceURI="/$params.controller/index.json"
@@ -68,7 +68,7 @@ class LegalGroupTypeController {
     
     def relatedLinks() {
         params.hostApp = RenderService.hostApp(request)
-        includeLinks(params)
+        extraLinks(params)
         def result = [:]
         result.controller = params.controller 
         params.links += ["self": ["href": "$params.hostApp/$result.controller/relatedLinks"]]
@@ -84,7 +84,7 @@ class LegalGroupTypeController {
         params.sourceURI="$uri"  
         params.hideclass = true
         params.URL =  RenderService.URL(request) 
-        includeLinks(params)      
+        extraLinks(params)      
         render RenderService.serviceMethod(params)
     }
     
@@ -94,7 +94,7 @@ class LegalGroupTypeController {
         params.collection = false
         params.hostApp = RenderService.hostApp(request) 
         params.URL =  RenderService.URL(request) 
-        includeLinks(params)
+        extraLinks()
         params.hide = ["id", "version"]
         params.sourceURI = "$uri"  
         params.hideclass = true
@@ -102,21 +102,22 @@ class LegalGroupTypeController {
         render RenderService.serviceMethod(params)         
     }
     
-    private includeLinks(params) {
+    private extraLinks() {
+        def controllerURL = "$params.hostApp/$params.controller"
         if (params.withlinks==null) { params.withlinks = request.getHeader('withlinks')}
         if (params.withlinks=="true" || params.withlinks==null ) { 
-            params.links  = ["list":["template": true, "fields": ["max"], "href":"$params.hostApp/$params.controller/list", "description":"List " ]]
-            params.links += ["get":["template": true, "fields": ["id"], "href": "$params.hostApp/$params.controller/get?id={id}"]]
-            params.links += ["schema": ["href": "$params.hostApp/$params.controller/schema"]]
-            params.links += ["create": ["href": "$params.hostApp/$params.controller/create", "notes":"Returns an empty instance of editable fields."]]
+            params.links  = ["list":["template": true, "fields": ["max"], "href":"$controllerURL/list", "description":"List " ]]
+            params.links += ["get":["template": true, "fields": ["id"], "href": "$controllerURL/get?id={id}"]]
+            params.links += ["schema": ["href": "$controllerURL/schema"]]
+            params.links += ["create": ["href": "$controllerURLr/create", "notes":"Returns an empty instance of editable fields."]]
             params.links += ["save":["template":true, "method":"PUT", "href": entities.Component.findByName('CoreUpdates').baseURL + "/$params.controller/save", \
                 "body":"@create", "notes":"If you have not in cache, get the body from the 'create'."]]
-                        params.links += ["relatedLinks": ["href": "$params.hostApp/$params.controller/relatedLinks", "notes":"Returns a list with the most frequent links."]]
+                        params.links += ["relatedLinks": ["href": "$controllerURLr/relatedLinks", "notes":"Returns a list with the most frequent links."]]
             if (params.id==null) {
-                params.links += ["myLegalGroups":["template": true, "fields": "id","href": "$params.hostApp/$params.controller/listMyLegalGroups?id={id}"]]           
+                params.links += ["myLegalGroups":["template": true, "fields": "id","href": "$controllerURLr/myLegalGroups?id={id}"]]           
             }
             else {
-                params.links += ["myLegalGroups":["href": "$params.hostApp/$params.controller/listMyLegalGroups?id=$params.id"]]            
+                params.links += ["myLegalGroups":["href": "$controllerURLr/myLegalGroups?id=$params.id"]]            
             }
         }        
     }    

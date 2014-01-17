@@ -146,24 +146,30 @@ class AdminController {
         def componentName = grailsApplication.metadata['app.name']
         def jactions = new JsonBuilder()
         jactions."$componentName"{
-            def x = request.getRequestURL() 
-            x = x.substring(0,x.indexOf('.dispatch')) - '/grails' - "/admin/componentsActionsByController" 
+            def x = request.getRequestURL()  
             links {
-                hostApp "$x" 
-                href "$x/home"                
-            }
+                hostApp x.substring(0,x.indexOf('.dispatch')) - '/grails' - '/admin/' - "$params.action" 
+                href x.substring(0,x.indexOf('.dispatch')) - '/grails'  
+            } 
             grailsApplication.controllerClasses.each {cc ->   
             String controller = cc.logicalPropertyName
             "$controller" {
                 cc.clazz.methods.each { m->
                     String action = m.name 
-                    def ann = m.getAnnotation(Action)
-                    if (ann) { 
-                        Class[] argTypes = ann.commandObjects()
-//                      // exclude index
-                        if ("$action"!="index") { 
-                           "$action" "/${controller}.$action(${argTypes*.name.join(', ')})"
+                    if (action in ["extraLinks"]) {
+                            // do nothing - skip 
                         }
+                    else {
+                        def ann = m.getAnnotation(Action)
+                        if (ann) { 
+                            Class[] argTypes = ann.commandObjects()
+    //                      // exclude index
+                            if ("$action"!="index") { 
+    //                           "$action" "/${controller}/$action(${argTypes*.name.join(', ')})"
+    //                            "$action" "$action(${argTypes*.name.join(', ')})"  - '()'
+                                "$action" "/${controller}/$action(${argTypes*.name.join(', ')})" - 'entities.' - '()'
+                            }
+                        }                        
                     }
                 }
              }

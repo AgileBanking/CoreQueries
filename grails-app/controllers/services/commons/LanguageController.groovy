@@ -2,63 +2,43 @@ package services.commons
 
 import grails.converters.JSON
 
-class LanguageController {
+class LanguageController extends BaseController {
+    def XRenderService        
+    def XBuildLinksService
+    
     static allowedMethods = [
         get: "GET",
-        getByIso2:'GET', 
-        shortList:'GET', 
-        list:'GET']
-    
-    def RenderService
-    
-    def index() { redirect(action: "shortList", params: params) }
-
-    def get(Long id) {
-        // ../CoreQueries/language/get?id=12
-        if (params.id==null ) {
-            response.status = 400 // 400 Bad Request
-            def answer = ["error":["status":"400", "id":"$id"]]
-            render answer as JSON
-        }
-        else {
-            def uri = "/language/show/$id" + ".json" //internal request to domains
-            params.sourceComponent="Commons"
-            params.sourceURI="$uri" 
-            params.URL =  RenderService.URL(request) 
-            params.URL += "?id=$id"
-            render RenderService.serviceMethod(params) 
-            }
-        } 
-        
+        list: "GET",
+        getByIso2: "GET",
+        shortList: "GET"
+    ]
+             
     def getByIso2(String iso2) {
-        // ../CoreQueries/currency/get?iso3=EUR
+        // ../CoreQueries/language/get?iso2=EUR
         if (iso2==null || iso2.size()!=2){
             response.status = 400 // 400 Bad Request
-            def answer = ["error":["status":"400", "expectedParams":"String iso3"]]
+            def answer = ["error":["status":"400", "expectedParams":"$iso2"]]
             render answer as JSON
         }
         else {
-            params.sourceComponent="Commons"
-            params.sourceURI="/language/getByIso2?iso2="+ iso2.toUpperCase()
-            params.URL =  RenderService.URL(request) 
+            def uri = "/language/getByIso2?iso2="+ iso2.toUpperCase()  //internal requestt to domains
+            params.sourceComponent=sourceComponent()
+            params.sourceURI="$uri" 
+            params.host = XRenderService.hostApp(request)
+            params.URL =  XRenderService.URL(request) 
             params.URL += "?iso2="+ iso2.toUpperCase()
-            render RenderService.serviceMethod(params) 
+            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links += extraLinks()
+            render XRenderService.serviceMethod(params, request) 
             }
-        } 
+        }      
         
-    def shortList() {
-        // ../CoreQueries/language/shortList
-        params.URL =  RenderService.URL(request) 
-        params.sourceComponent="Commons"
-        params.sourceURI="/language/shortList"
-        render RenderService.serviceMethod(params)       
-        }     
-        
-    def list() {
-        // ../CoreQueries/language/list
-        params.URL =  RenderService.URL(request) 
-        params.sourceComponent="Commons"
-        params.sourceURI="/language/index.json"
-        render RenderService.serviceMethod(params)       
-        } 
+    def extraLinks() { 
+        def controllerURL = "$params.host/$params.controller"
+        def links = [:]
+        links += ["getByIso2":["template":true, "fields": ["iso2":"String (Language: ISO 639-2 code)"], \
+            "href":  "$controllerURL/getByIso2?iso2={iso2}" ]]
+        links += ["references":["ISO 639-2 code": "http://www.loc.gov/standards/iso639-2/php/code_list.php"]]
+        return links 
+    }   
 }

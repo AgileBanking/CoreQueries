@@ -15,32 +15,20 @@ class CurrencyController extends BaseController {
         }
         else {
             def uri = "/currency/getByIso3?iso3="+ iso3.toUpperCase()  //internal requestt to domains
-            params.sourceComponent="Commons"
+            params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.hostApp = XRenderService.hostApp(request)
+            params.host = XRenderService.hostApp(request)
             params.URL =  XRenderService.URL(request) 
             params.URL += "?iso3="+ iso3.toUpperCase()
             params.links = XBuildLinksService.controllerLinks(params, request)
-            params.links += extraLinks("$params.hostApp/$params.controller")
+            params.links += extraLinks()
             render XRenderService.serviceMethod(params, request) 
             }
-        }     
+        }       
         
-    def shortList() {
-        // ../CoreQueries/currency/shortList
-        //params.URL =  "$request.scheme://$request.serverName:$request.serverPort/" + RenderService.AppName(request) + "/$controllerName"  
-        params.URL =  XRenderService.URL(request) 
-        params.sourceComponent="Commons"
-        params.hostApp = XRenderService.hostApp(request)
-        params.sourceURI="/currency/shortList"
-        params.links = XBuildLinksService.controllerLinks(params, request)
-        params.links += extraLinks("$params.hostApp/$params.controller")
-        render XRenderService.serviceMethod(params, request)       
-        }     
-        
-    def extraLinks(String controllerURL) { 
+    def extraLinks() { 
+        def controllerURL = "$params.host/$params.controller"
         def links = [:]
-        links += ["shortList": ["href": "$controllerURL/shortList"]]
         links += ["getByIso3":["template":true, "fields": ["iso3":"String"], "href":  "$controllerURL/getByIso3?iso3={iso3}"]]
         return links 
     }     

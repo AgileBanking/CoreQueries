@@ -1,4 +1,3 @@
-package admin
-
+package helpers
 class XRenderService extends RenderService{
 }

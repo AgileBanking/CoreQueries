@@ -1,3 +1,3 @@
-package admin
+package helpers
 class XBuildLinksService  extends BuildLinksService{
 }

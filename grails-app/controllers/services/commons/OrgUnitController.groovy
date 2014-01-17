@@ -1,47 +1,63 @@
 package services.commons
 import grails.converters.JSON
-class OrgUnitController {
 
+class OrgUnitController extends BaseController {
+    def XRenderService        
+    def XBuildLinksService
+    
     static allowedMethods = [
         get: "GET",
         getByCode:'GET', 
         shortList:'GET', 
         list:'GET']
-        
-    def index() { redirect(action: "shortList", params: params) }
-    
-    def RenderService
 
-    def get(Long id) {
-        // ../CoreQueries/orgUnit/get?id=10
-        if (params.id==null ) {
+    def getByCode(String code) {
+        // ../CoreQueries/orgUnit/get?code=EUR
+        if (code==null){
             response.status = 400 // 400 Bad Request
-            def answer = ["error":["status":"400", "id":"$id"]]
+            def answer = ["error":["status":"400", "expectedParams":"$code"]]
             render answer as JSON
         }
         else {
-            def uri = "/orgUnit/show/$id" + ".json" //internal request to domains
-            params.sourceComponent="Commons"
+            def uri = "/orgUnit/getByCode?code="+ code.toUpperCase()  //internal requestt to domains
+            params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.URL =  RenderService.URL(request) 
-            params.URL += "?id=$id"
-            render RenderService.serviceMethod(params) 
+            params.host = XRenderService.hostApp(request)
+            params.URL =  XRenderService.URL(request) 
+            params.URL += "?code="+ code.toUpperCase()
+            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links += extraLinks()
+            render XRenderService.serviceMethod(params, request) 
             }
-        } 
-        
-    def shortList() {
-        // ../CoreQueries/orgUnit/shortList
-        params.URL =  RenderService.URL(request) 
-        params.sourceComponent="Commons"
-        params.sourceURI="/orgUnit/shortList"
-        render RenderService.serviceMethod(params)       
         }     
+
+    def getOrgUnitType(Long id) {
+        // ../CoreQueries/orgUnit/getOrgUnitType?code=EUR
+        if (id==null){
+            response.status = 400 // 400 Bad Request
+            def answer = ["error":["status":"400", "expectedParams":"$code"]]
+            render answer as JSON
+        }
+        else {
+            def uri = "/orgUnit/getOrgUnitType?id=$id"  //internal request to domains
+            params.sourceComponent=sourceComponent()
+            params.sourceURI="$uri" 
+            params.host = XRenderService.hostApp(request)
+            params.URL =  XRenderService.URL(request) 
+            params.URL += "?id=$id"
+            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links += extraLinks()
+            render XRenderService.serviceMethod(params, request) 
+            }
+        }         
         
-    def list() {
-        // ../orgUnit/list
-        params.sourceComponent="Commons"
-        params.URL =  RenderService.URL(request) 
-        params.sourceURI="/orgUnit/index.json"
-        render RenderService.serviceMethod(params)        
-        }      
+    def extraLinks(){ 
+        def controllerURL = "$params.host/$params.controller"
+        def links = [:]
+        links += ["getByCode":["template":true, "fields": ["code":"String (Organization Unit code)"], \
+            "href":  "$controllerURL/getByCode?code={code}" ]]
+        links += ["OrgUnitType": ["template":true, "fields": ["id": "Long"],
+            "href": "$controllerURL/getOrgUnitType?id={id}" ]]
+        return links 
+    }   
 }

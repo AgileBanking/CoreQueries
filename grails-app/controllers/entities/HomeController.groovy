@@ -16,13 +16,13 @@ class HomeController {
         def jactions = new JsonBuilder()
         def component = [:]
         def controllerLinks = [:]
-        params.hostApp = RenderService.hostApp(request)
+        params.host = RenderService.hostApp(request)
         def x = request.getRequestURL() 
         x = x.substring(0,x.indexOf('.dispatch')) - '/grails' - "/admin/componentsActionsByController" - "index"
-        component =["$componentName" : ["links":["host" : ["hostApp":"$x" - "/home"],"repo":["href":"$x" ]]]]
+        component =["$componentName" : ["links":["repo" : ["home":"$x" - "/home"],"repo":["href":"$x" ]]]]
         grailsApplication.controllerClasses.each {cc -> 
             String controller = cc.logicalPropertyName
-            if ("$controller" !="dbdoc") {
+            if (['admin', 'component', 'dbdoc'].contains(controller)==false) { 
                 params.controller = "$controller"
                 controllerLinks += ["$controller" : BuildLinksService.controllerLinks(params, request) ]
             }

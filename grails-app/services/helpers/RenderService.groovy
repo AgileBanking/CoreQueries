@@ -1,14 +1,15 @@
-package admin
+package helpers
 import grails.plugins.rest.client.RestBuilder
 import grails.converters.*
+import java.security.MessageDigest 
 
 class RenderService {
     static transactional = false
     
-    def serviceMethod(params, request) {
+    def prepareAnswer(params, request) {
         def baseURL = entities.Component.findByName(params.sourceComponent).baseURL
         params.reqID = UUID.randomUUID().toString()
-        params.timestamp = new Date().toString()
+        params.Date = new Date().toString()
         // prepare hyperlinks    
         def href = "$params.URL"
         def links = ["self": ["href": "$params.URL"]]
@@ -23,31 +24,42 @@ class RenderService {
         params.remove("links")
         params.remove("URL")
         // define variables
-        def answer = ""
+        def answer = [:]
         def xref = ""
-        def resp 
+        def resp, s
         def rest = new RestBuilder()
-        def s
+        println "$baseURL$params.sourceURI"
         try {        
             resp = rest.get("$baseURL$params.sourceURI") { 
                 accept "application/json"
                 contentType "application/json"
                 } 
+//            def xj = resp.json[0] as JSON
             params.status = resp.status.toString() 
             if (resp.status < 300 && resp.json.class != null) { 
                 resp.json.remove("class") 
             }
             if (params.hide) {
                 params.hide.each {
-                    resp.json.remove("$it")
+                    resp.json.remove("$it") 
                 }
                 params.remove("hide")
             }
+            // If not modified return nothing  
+            params.ETag = MD5(resp.json.toString())
+            def rETag = request.getHeader("If-None-Match")
+//            println "rETag: $rETag, pTag: $params.ETag" 
+            if (rETag != null && "$rETag" == "$params.ETag") {
+                params.status = 304
+                answer = [status:"304", description:"Not Modified"] 
+                return answer as JSON
+            }
+            
         } 
         catch(Exception e2) {
-            //answer = ["status":"$resp.status" , "message": "$e2.message", "sourceURI":"$baseURL$params.sourceURI"]  
             def xe2 = e2.toString() //.message.split(':')
-            answer = ["message": [xe2]] 
+            params.status = 503
+            answer = ["status":"503", "possibleCause": "Unavailable Domain Server $params.sourceComponent", "message":[xe2]] 
             return answer as JSON
         }       
 
@@ -57,7 +69,7 @@ class RenderService {
         }
         else {
             params.notes = "To hide 'links' include in the headers or in request 'withlinks=false'."
-            answer = ["header":params, "links": links, "body":resp.json]
+            answer = ["header":params, "body":resp.json, "links": links ]
 //            answer = ["header":params, "request": request, "links": links, "body":resp.json]
         }
         
@@ -77,8 +89,7 @@ class RenderService {
         }
         catch(Exception e3) {
             answer.header.error="$e3.message" 
-        }
-        
+        } 
         return answer as JSON      
     }
     
@@ -89,7 +100,13 @@ class RenderService {
     
     def hostApp(request) {
         def appName = entities.Component.findByName("CoreQueries").baseURL 
-        def x = request.getRequestURL() 
+        def x = request.getRequestURL()  
         return x.substring(0,x.indexOf("$appName") + appName.size())  
     }      
+    
+    def MD5(String s) {
+        MessageDigest digest = MessageDigest.getInstance("MD5")
+        digest.update(s.bytes);
+        new BigInteger(1, digest.digest()).toString(16).padLeft(32, '0')        
+    }
 }
