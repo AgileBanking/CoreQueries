@@ -22,7 +22,7 @@ class CurrencyController extends BaseController {
             params.URL += "?iso3="+ iso3.toUpperCase()
             params.links = XBuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render XRenderService.serviceMethod(params, request) 
+            renderNow()  //render XRenderService.serviceMethod(params, request) 
             }
         }       
         

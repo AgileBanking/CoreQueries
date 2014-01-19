@@ -19,7 +19,7 @@ class BuildLinksService {
             links += ["relatedLinks": ["href": "$controllerURL/relatedLinks", "notes":"Returns a list with the most frequent links."]]
             links += ["theBank": ["href": "$params.host/theBank", "notes":"The unique resource that holds most the operational profile of the Bank."]]
             links += ["repo": ["href": "$params.host/home", "notes": " The repository of hypermedia links of the $params.host"]]
-//            links += ["extraLinks": ["href": "$controllerURL/extraLinks", "notes":"Returns links dedicated to the specific controller."]]
+            links += ["refreshCache": ["href": "$params.host/refreshCache", "notes":"Clears all caches (client and proxies). Use it after a system/client disruption."]]
             return links 
         }        
     } 

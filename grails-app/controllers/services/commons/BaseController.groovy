@@ -7,7 +7,6 @@ abstract class BaseController {
         get:                "GET", 
         schema:             "GET",
         create:             "GET",
-        listMyLegalGroups:  "GET",
         relatedLinks:       "GET",
         shortList:          "GET",
         list:               "GET"]
@@ -15,6 +14,7 @@ abstract class BaseController {
     def index() { redirect(action: "shortList", params: params) }
     
     private sourceComponent() {"Commons"}
+    private casheControl() {"public, max-age=72000"} // 20 hours
     
     def RenderService
     def BuildLinksService
@@ -35,7 +35,8 @@ abstract class BaseController {
             params.hideclass = true
             params.URL =  RenderService.URL(request) 
             params.URL += "?id=$id"
-            render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
+            renderNow()
+//            render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
             }
         } 
           
@@ -50,7 +51,8 @@ abstract class BaseController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)  
         params.offset = params.offset ? params.int('offset') : 0
         params.sourceURI="/$params.controller/index.json?max=$params.max&offset=$params.offset"
-        render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
+        renderNow()
+//        render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
         }      
 
     def shortList() {
@@ -61,7 +63,8 @@ abstract class BaseController {
         params.sourceURI="/$params.controller/shortList"
         params.links = BuildLinksService.controllerLinks(params, request)
         params.links += extraLinks()
-        render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)            
+        renderNow()
+//        render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)            
         }    
 
     def schema() {
@@ -74,7 +77,7 @@ abstract class BaseController {
         params.URL =  RenderService.URL(request) 
         params.links = BuildLinksService.controllerLinks(params, request) 
         params.links += extraLinks()
-        render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)     
+        renderNow()    
     }
     
     def create() {
@@ -89,7 +92,7 @@ abstract class BaseController {
         params.sourceURI = "$uri"  
         params.hideclass = true
         params.URL =  RenderService.URL(request) 
-        render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)     
+        renderNow()    
     }
     
     def relatedLinks() {
@@ -102,7 +105,19 @@ abstract class BaseController {
         result.links= params.links
         render result as JSON
     }     
-     
+
+    private renderNow() {
+        def answer = RenderService.prepareAnswer(params, request)   
+        if (params.status==304) { // Not Modified
+            render status:"$params.status"
+            return
+        }
+        params."Cashe-Control" = casheControl()
+        response.setHeader("Cache-Control",params."Cashe-Control")
+        response.setHeader("ETag",params.ETag)          
+        render (contentType: "application/json", text:answer, status:params.status, ETag:params.ETag,"Cache-Control":params."Cashe-Control")         
+    }
+    
     // returns an array with extra links to be attached in the response by the caller
     def extraLinks() {
         def links = [:]

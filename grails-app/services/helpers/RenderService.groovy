@@ -28,14 +28,16 @@ class RenderService {
         def xref = ""
         def resp, s
         def rest = new RestBuilder()
-        println "$baseURL$params.sourceURI"
         try {        
             resp = rest.get("$baseURL$params.sourceURI") { 
                 accept "application/json"
                 contentType "application/json"
                 } 
 //            def xj = resp.json[0] as JSON
-            params.status = resp.status.toString() 
+            params.status = resp.status 
+//            if (params.status == 404) {
+//                return 
+//            }
             if (resp.status < 300 && resp.json.class != null) { 
                 resp.json.remove("class") 
             }
@@ -46,17 +48,18 @@ class RenderService {
                 params.remove("hide")
             }
             // If not modified return nothing  
-            params.ETag = MD5(resp.json.toString())
+            def md5= MD5(resp.json.toString())
             def rETag = request.getHeader("If-None-Match")
-//            println "rETag: $rETag, pTag: $params.ETag" 
-            if (rETag != null && "$rETag" == "$params.ETag") {
+//            println "rETag: $rETag, pTag: $md5" 
+            params.ETag = md5 
+            if ("$rETag" == "$md5") { 
                 params.status = 304
-                answer = [status:"304", description:"Not Modified"] 
-                return answer as JSON
-            }
+                return 
+            } 
             
         } 
         catch(Exception e2) {
+            println "Oops 1"
             def xe2 = e2.toString() //.message.split(':')
             params.status = 503
             answer = ["status":"503", "possibleCause": "Unavailable Domain Server $params.sourceComponent", "message":[xe2]] 
