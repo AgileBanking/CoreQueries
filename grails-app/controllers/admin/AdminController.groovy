@@ -11,6 +11,8 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 class AdminController {
     def grailsApplication
     LinkGenerator grailsLinkGenerator
+    def RenderService
+    def BuildLinksService
     
     def index() {redirect(action: "menu") }
 
@@ -32,9 +34,9 @@ class AdminController {
         <br>
         <ol>
           <li><a href="XSD" target="_blank">Data
-        Model in XML Schema</a></li>
+        Model in XML Schema[*]</a></li>
           <li><a href="JSD" target="_blank">Data
-        Model in JSON Schema</a></li>
+        Model in JSON Schema[*]</a></li>
           <li><a href="relationsDiagram" target="_blank">Relations
         Diagram</a></li>
           <ol>
@@ -44,11 +46,10 @@ class AdminController {
             <li><a href="relationsDiagram?ComponentName=Products" target="_blank">Products</li>
             <li><a href="relationsDiagram?ComponentName=Accounts" target="_blank">Accounts</li>\n\
           </ol>
-          <li><a href="componentsActionsByController"
-         target="_blank">Actions
-        by Controller</a></li>
+          <li><a href="componentsActionsByController" target="_blank">Actions by Controller</a></li>\n\
+          <li><a href="repo" target="_blank">Resources (services) repository</a></li>\n\
         </ol>
-        You can address specific component by appending:<br>
+        [*] You can address specific component by appending:<br>
         ?ComponentName={component}<br>
         For example, after calling one of the above, append:<br>
         ?ComponentName=Commons
@@ -353,5 +354,28 @@ class AdminController {
         }
         return name
     }        
+
+    def repo() {
+        def componentName = grailsApplication.metadata['app.name']
+        def jactions = new JsonBuilder()
+        def component = [:]
+        def controllerLinks = [:]
+        params.host = RenderService.hostApp(request)
+        def x = request.getRequestURL() 
+        x = x.substring(0,x.indexOf('.dispatch')) - '/grails' - "/admin/componentsActionsByController" - "index"
+        component =["$componentName" : ["links":["repo" : ["home":"$x" - "/home"],"repo":["href":"$x" ]]]]
+        grailsApplication.controllerClasses.each {cc -> 
+            String controller = cc.logicalPropertyName
+            params.controller = "$controller"
+            if (['admin', 'repo', 'component', 'dbdoc', 'refreshCache'].contains(controller)) { 
+                controllerLinks += ["$controller" : BuildLinksService.controllerSingleLink(params, request)] 
+            }
+            else {
+                controllerLinks += ["$controller" : BuildLinksService.controllerLinks(params, request) ]
+            }
+        }
+        def result = ["component": component, "controllers": controllerLinks] as JSON
+        render result
+    }
     
 }

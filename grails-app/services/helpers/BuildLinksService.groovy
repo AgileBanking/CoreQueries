@@ -23,4 +23,9 @@ class BuildLinksService {
             return links 
         }        
     } 
+    
+    def controllerSingleLink(params, request) {
+        return ["$params.controller": ["href": "$params.host/$params.controller"]]              
+    }
+
 }

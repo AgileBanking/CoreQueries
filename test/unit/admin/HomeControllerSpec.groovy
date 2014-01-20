@@ -1,6 +1,4 @@
-package entities
-
-
+package admin
 
 import grails.test.mixin.*
 import org.junit.*
@@ -8,8 +6,8 @@ import org.junit.*
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
-@TestFor(HomeController)
-class HomeControllerSpec {
+@TestFor(RepoController)
+class RepoControllerSpec {
 
     void testSomething() {
        fail "Implement me"
