@@ -62,7 +62,7 @@ class RenderService {
             println "Oops 1"
             def xe2 = e2.toString() //.message.split(':')
             params.status = 503
-            answer = ["status":"503", "possibleCause": "Unavailable Domain Server $params.sourceComponent", "message":[xe2]] 
+            answer = ["status":params.status, "possibleCause": "Unavailable Domain Server $params.sourceComponent", "message":[xe2]] 
             return answer as JSON
         }       
 

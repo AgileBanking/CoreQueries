@@ -14,7 +14,8 @@ abstract class BaseController {
     def index() { redirect(action: "shortList", params: params) }
     
     private sourceComponent() {"Commons"}
-    private casheControl() {"public, max-age=72000"} // 20 hours
+//    private casheControl() {"public, max-age=5" } // 72000 for 20 hours
+    def casheControl() {"private, no-cache, no-store" }
     
     def RenderService
     def BuildLinksService
@@ -26,7 +27,6 @@ abstract class BaseController {
             render answer as JSON
         }
         else {
-            params.sourceURI = "/$params.controller/show/$id" + ".json" //internal request to domains
             params.sourceComponent=sourceComponent()
             params.collection = false
             params.host = RenderService.hostApp(request) 
@@ -34,7 +34,9 @@ abstract class BaseController {
             params.links += extraLinks()
             params.hideclass = true
             params.URL =  RenderService.URL(request) 
-            params.URL += "?id=$id"
+            params.recStatus = (params.recStatus ? params.recStatus.toLowerCase() : "Active").capitalize()  
+            params.sourceURI = "/$params.controller/show.json?id=$id&recStatus=$params.recStatus"   //internal request to domains
+            params.URL += "?id=$id&recStatus=$params.recStatus" 
             renderNow()
 //            render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
             }
@@ -50,17 +52,19 @@ abstract class BaseController {
         params.hideclass = true
         params.max = Math.min(params.max ? params.int('max') : 10, 100)  
         params.offset = params.offset ? params.int('offset') : 0
-        params.sourceURI="/$params.controller/index.json?max=$params.max&offset=$params.offset"
+        params.recStatus = (params.recStatus ? params.recStatus.toLowerCase() : "Active").capitalize() 
+        params.sourceURI="/$params.controller/index.json?max=$params.max&offset=$params.offset&recStatus=$params.recStatus"
         renderNow()
 //        render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
         }      
 
     def shortList() {
         // ../CoreQueries/currency/shortList
-        params.URL =  RenderService.URL(request) 
+        params.URL =  RenderService.URL(request)  
         params.sourceComponent=sourceComponent()
         params.host = RenderService.hostApp(request)
-        params.sourceURI="/$params.controller/shortList"
+        params.recStatus = (params.recStatus ? params.recStatus.toLowerCase() : "Active").capitalize() 
+        params.sourceURI="/$params.controller/shortList?recStatus=$params.recStatus" 
         params.links = BuildLinksService.controllerLinks(params, request)
         params.links += extraLinks()
         renderNow()
@@ -108,7 +112,7 @@ abstract class BaseController {
 
     private renderNow() {
         def answer = RenderService.prepareAnswer(params, request)   
-        if (params.status==304) { // Not Modified
+        if ( params.status == 304) { // Not Modified: return the shortest possible answer without decoration
             render status:"$params.status"
             return
         }
