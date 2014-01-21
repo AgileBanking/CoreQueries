@@ -9,9 +9,9 @@ class BuildLinksService {
         if (params.withlinks==null) { params.withlinks = request.getHeader('withlinks')}
         if (params.withlinks=="true" || params.withlinks==null ) { 
             links  = ["list":["template": true, "fields": ["max":"Long (default=10, maximum 100)","offset":"Long (after page number, default=0)"], \
-                "href":"$controllerURL/list?max={max}&offset={offset}", "notes":"It lists a paginated collection of resources." ]]
-            links += ["shortList": ["href": "$controllerURL/shortList"]]
-            links += ["get":["template": true, "fields": ["id":"Long"], "href": "$controllerURL/get?id={id}", "notes":"Retrieves a single resource based on its 'id'."]]
+                "href":"$controllerURL/list?max={max}&offset={offset}", "notes":"It lists a paginated collection of resources. It accepts, optionally, the 'recStatus' parameter" ]]
+            links += ["shortList": ["href": "$controllerURL/shortList", "notes" : "It accepts, optionally, the 'recStatus' parameter"]]
+            links += ["get":["template": true, "fields": ["id":"Long"], "href": "$controllerURL/get?id={id}", "notes":"Retrieves a single resource based on its 'id'. It accepts, optionally, the 'recStatus' parameter"]]
             links += ["schema": ["href": "$controllerURL/schema", "notes":"The schema (properties-fields) of the resource."]]
             links += ["create": ["href": "$controllerURL/create", "notes":"Returns an empty instance of editable fields."]]
             links += ["save":["template":true, "methods":["PUT", "POST"], "href": entities.Component.findByName('CoreUpdates').baseURL + "/$params.controller/save", \

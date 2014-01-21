@@ -59,7 +59,6 @@ class RenderService {
             
         } 
         catch(Exception e2) {
-            println "Oops 1"
             def xe2 = e2.toString() //.message.split(':')
             params.status = 503
             answer = ["status":params.status, "possibleCause": "Unavailable Domain Server $params.sourceComponent", "message":[xe2]] 
