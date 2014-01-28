@@ -3,8 +3,6 @@ import grails.converters.deep.JSON
 import grails.plugins.rest.client.RestBuilder
 
 class TheBankController extends BaseController {
-    def XRenderService        
-    def XBuildLinksService
     
     static allowedMethods = [
         getBank:    'GET',
@@ -94,8 +92,8 @@ class TheBankController extends BaseController {
     private thisBank() {
         params.sourceComponent=sourceComponent()
         params.sourceURI="/theBank/" 
-        params.host = XRenderService.host(request)
-        params.URL =  XRenderService.URL(request)  
+        params.host = RenderService.host(request)
+        params.URL =  RenderService.URL(request)  
         def answer =""
         def resp 
         def rest = new RestBuilder()

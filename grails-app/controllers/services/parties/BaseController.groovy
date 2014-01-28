@@ -30,8 +30,11 @@ abstract class BaseController {
             params.sourceComponent=sourceComponent()
             params.collection = false
             params.host = XRenderService.hostApp(request) 
-            params.links = XBuildLinksService.controllerLinks(params, request) 
-            params.links += extraLinks()
+            params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+            if (params.withlinks == "true") {
+                params.links = XBuildLinksService.controllerLinks(params, request) 
+                params.links += extraLinks()
+            }
             params.hideclass = true
             params.URL =  XRenderService.URL(request) 
             params.URL += "?id=$id"
@@ -44,8 +47,11 @@ abstract class BaseController {
         params.sourceComponent=sourceComponent()
         params.collection = true
         params.host = XRenderService.hostApp(request)
-        params.links = XBuildLinksService.controllerLinks(params, request)  
-        params.links += extraLinks()
+        params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+        if (params.withlinks == "true") {
+            params.links = XBuildLinksService.controllerLinks(params, request)  
+            params.links += extraLinks()
+        }
         params.URL =  XRenderService.URL(request) 
         params.hideclass = true
         params.max = Math.min(params.max ? params.int('max') : 10, 100)  
@@ -61,8 +67,11 @@ abstract class BaseController {
         params.sourceComponent=sourceComponent()
         params.host = XRenderService.hostApp(request)
         params.sourceURI="/$params.controller/shortList"
-        params.links = XBuildLinksService.controllerLinks(params, request)
-        params.links += extraLinks()
+        params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+        if (params.withlinks == "true") {
+            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links += extraLinks()
+        }
         renderNow()
 //        render (text:XRenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)            
         }    
@@ -75,8 +84,11 @@ abstract class BaseController {
         params.sourceURI="$uri"  
         params.hideclass = true
         params.URL =  XRenderService.URL(request) 
-        params.links = XBuildLinksService.controllerLinks(params, request) 
-        params.links += extraLinks()
+        params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+        if (params.withlinks == "true") {
+            params.links = XBuildLinksService.controllerLinks(params, request) 
+            params.links += extraLinks()
+        }
         renderNow()    
     }
     
@@ -86,8 +98,11 @@ abstract class BaseController {
         params.collection = false
         params.host = XRenderService.hostApp(request) 
         params.URL =  XRenderService.URL(request) 
-        params.links = XBuildLinksService.controllerLinks(params, request)
-        params.links += extraLinks()
+        params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+        if (params.withlinks == "true") {
+            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links += extraLinks()
+        }
         params.hide = ["id", "version"]
         params.sourceURI = "$uri"  
         params.hideclass = true

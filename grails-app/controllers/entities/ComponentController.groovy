@@ -12,7 +12,7 @@ class ComponentController {
     static allowedMethods = [
         save: "POST", 
         update: "POST", 
-        delete: "POST",
+        delete: "DELETE",
         index: "GET",
         list: "GET",
         listMethods: "GET",

@@ -3,8 +3,6 @@ package services.commons
 import grails.converters.JSON
 
 class CountryController extends BaseController {
-    def XRenderService        
-    def XBuildLinksService
     
     static allowedMethods = [
         get: "GET",
@@ -24,12 +22,12 @@ class CountryController extends BaseController {
             def uri = "/country/getByIso2?iso2="+ iso2.toUpperCase()  //internal requestt to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = XRenderService.hostApp(request)
-            params.URL =  XRenderService.URL(request) 
+            params.host = RenderService.hostApp(request)
+            params.URL =  RenderService.URL(request) 
             params.URL += "?iso2="+ iso2.toUpperCase()
-            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render XRenderService.serviceMethod(params, request) 
+            render RenderService.serviceMethod(params, request) 
             }
         }         
         

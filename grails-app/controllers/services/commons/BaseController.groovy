@@ -30,8 +30,11 @@ abstract class BaseController {
             params.sourceComponent=sourceComponent()
             params.collection = false
             params.host = RenderService.hostApp(request) 
-            params.links = BuildLinksService.controllerLinks(params, request) 
-            params.links += extraLinks()
+            params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+            if (params.withlinks == "true") {
+                params.links = BuildLinksService.controllerLinks(params, request) 
+                params.links += extraLinks()
+            }
             params.hideclass = true
             params.URL =  RenderService.URL(request) 
             params.recStatus = (params.recStatus ? params.recStatus.toLowerCase() : "Active").capitalize()  
@@ -46,8 +49,11 @@ abstract class BaseController {
         params.sourceComponent=sourceComponent()
         params.collection = true
         params.host = RenderService.hostApp(request)
-        params.links = BuildLinksService.controllerLinks(params, request)  
-        params.links += extraLinks()
+        params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+        if (params.withlinks == "true"  ) {
+            params.links = BuildLinksService.controllerLinks(params, request)  
+            params.links += extraLinks()            
+        }
         params.URL =  RenderService.URL(request) 
         params.hideclass = true
         params.max = Math.min(params.max ? params.int('max') : 10, 100)  
@@ -60,15 +66,17 @@ abstract class BaseController {
 
     def shortList() {
         // ../CoreQueries/currency/shortList
+        params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
         params.URL =  RenderService.URL(request)  
         params.sourceComponent=sourceComponent()
         params.host = RenderService.hostApp(request)
         params.recStatus = (params.recStatus ? params.recStatus.toLowerCase() : "Active").capitalize() 
         params.sourceURI="/$params.controller/shortList?recStatus=$params.recStatus" 
-        params.links = BuildLinksService.controllerLinks(params, request)
-        params.links += extraLinks()
-        renderNow()
-//        render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)            
+        if (params.withlinks == "true"  ) {
+            params.links = BuildLinksService.controllerLinks(params, request)
+            params.links += extraLinks()            
+        }
+        renderNow()        
         }    
 
     def schema() {
@@ -79,8 +87,11 @@ abstract class BaseController {
         params.sourceURI="$uri"  
         params.hideclass = true
         params.URL =  RenderService.URL(request) 
-        params.links = BuildLinksService.controllerLinks(params, request) 
-        params.links += extraLinks()
+        params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+        if (params.withlinks == "true"  ) {
+            params.links = BuildLinksService.controllerLinks(params, request) 
+            params.links += extraLinks()
+        }
         renderNow()    
     }
     
@@ -90,8 +101,11 @@ abstract class BaseController {
         params.collection = false
         params.host = RenderService.hostApp(request) 
         params.URL =  RenderService.URL(request) 
-        params.links = BuildLinksService.controllerLinks(params, request)
-        params.links += extraLinks()
+        params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+        if (params.withlinks == "true"  ) {
+            params.links = BuildLinksService.controllerLinks(params, request)
+            params.links += extraLinks()
+        }
         params.hide = ["id", "version"]
         params.sourceURI = "$uri"  
         params.hideclass = true
@@ -101,12 +115,12 @@ abstract class BaseController {
     
     def relatedLinks() {
         params.host = RenderService.hostApp(request)
-        params.links = BuildLinksService.controllerLinks(params, request)
         def result = [:]
         result.controller = params.controller 
+        params.links = BuildLinksService.controllerLinks(params, request)
         params.links += ["self": ["href": "$params.host/$result.controller/relatedLinks"]]
         params.links += extraLinks()
-        result.links= params.links
+        result.links= params.links            
         render result as JSON
     }     
 

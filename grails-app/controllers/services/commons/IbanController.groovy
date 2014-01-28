@@ -3,8 +3,6 @@ package services.commons
 import grails.converters.JSON
 
 class IbanController extends BaseController {
-    def XRenderService        
-    def XBuildLinksService
 
     static allowedMethods = [
         getByCountryIso2:'GET', 
@@ -22,17 +20,17 @@ class IbanController extends BaseController {
             def uri = "/$params.controller/$params.action?iso2="+ iso2.toUpperCase()  //internal requestt to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = XRenderService.hostApp(request)
-            params.URL =  XRenderService.URL(request) 
+            params.host = RenderService.hostApp(request)
+            params.URL =  RenderService.URL(request) 
             params.URL += "?iso2="+ iso2.toUpperCase()
-            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render XRenderService.serviceMethod(params, request) 
+            render RenderService.serviceMethod(params, request) 
             }
         }                  
    
     def extraLinks() {
-        def controllerURL = XRenderService.hostApp(request) + "/$params.controller"
+        def controllerURL = RenderService.hostApp(request) + "/$params.controller"
         def links = [:]
         links += ["getByCountryIso2":["template":true, "fields": ["iso2":"String (Country: ISO 3166 alpha-2 code)"], \
             "href":  "$controllerURL/getByCountryIso2?iso2={iso2}" ]]

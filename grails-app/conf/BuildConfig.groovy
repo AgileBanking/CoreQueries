@@ -22,7 +22,7 @@ grails.project.fork = [
 ]
 //grails.project.docs.output.dir = 'web-app/docs'
 
-grails.project.dependency.resolver = "ivy" // or "maven" 
+grails.project.dependency.resolver = "maven"  //"ivy" or "maven" 
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {
@@ -54,15 +54,15 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the build system only
-        build ":tomcat:7.0.42"
+        build ':tomcat:7.0.50'
 
         // plugins for the compile step
         compile ":scaffolding:2.0.1"
         compile ':cache:1.1.1'
-        compile ":rest-client-builder:2.0.0" 
+        compile ":rest-client-builder:2.0.1" 
 
         // plugins needed at runtime but not for compilation
-        runtime ":hibernate:3.6.10.2" // or ":hibernate4:4.1.11.2"
+        runtime ':hibernate:3.6.10.7' //":hibernate:3.6.10.2" // or ":hibernate4:4.1.11.2"
         runtime ":database-migration:1.3.5"
         runtime ":jquery:1.10.2"
         runtime ":resources:1.2.1"

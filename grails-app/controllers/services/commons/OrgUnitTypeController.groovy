@@ -2,9 +2,7 @@ package services.commons
 import grails.converters.JSON
 
 class OrgUnitTypeController extends BaseController {
-    def XRenderService        
-    def XBuildLinksService
-    
+
     static allowedMethods = [
         get: "GET",
         getByCode:'GET', 
@@ -22,12 +20,12 @@ class OrgUnitTypeController extends BaseController {
             def uri = "/orgUnit/getByCode?code="+ code.toUpperCase()  //internal requestt to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = XRenderService.hostApp(request)
-            params.URL =  XRenderService.URL(request) 
+            params.host = RenderService.hostApp(request)
+            params.URL =  RenderService.URL(request) 
             params.URL += "?code="+ code.toUpperCase()
-            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render XRenderService.serviceMethod(params, request) 
+            render RenderService.serviceMethod(params, request) 
             }
         }      
         

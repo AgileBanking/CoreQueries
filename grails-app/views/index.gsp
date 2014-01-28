@@ -115,8 +115,9 @@
 		</div>
 		<div id="page-body" role="main">
 			<h1>Welcome to  Agile Banking</h1>
+                        
                         <h2>Component: CORE QUERIES LAYER</h2>
-			<p>This is the Core Queries layer of the 'Agile Banking' that exposes READ ONLY data. You can access all Core Components as GET REST services:</p>
+			<p>This is the Core Queries layer of the 'Agile Banking' that exposes READ ONLY data. You can access all Core resources with HTTP GET method:</p>
 			<p>These components have been implemented as MVC pattern. The following list shows all available controllers.<p>
 
 			<div id="controller-list" role="navigation">

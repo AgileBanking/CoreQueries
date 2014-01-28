@@ -1,8 +1,6 @@
 package services.commons
 import grails.converters.JSON
 class TimezoneController extends BaseController {
-    def XRenderService        
-    def XBuildLinksService
 
 static allowedMethods = [
     get: "GET",
@@ -25,10 +23,10 @@ static allowedMethods = [
             println uri
             params.sourceComponent="Commons"
             params.sourceURI="$uri" 
-            params.URL =  XRenderService.URL(request) 
+            params.URL =  RenderService.URL(request) 
             params.URL += "?location="+ location
 //            params.caller = "$request.forwardURI" 
-            render XRenderService.serviceMethod(params, request) 
+            render RenderService.serviceMethod(params, request) 
             }
         }  
    

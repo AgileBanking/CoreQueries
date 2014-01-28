@@ -10,6 +10,8 @@ class RenderService {
         def baseURL = entities.Component.findByName(params.sourceComponent).baseURL
         params.reqID = UUID.randomUUID().toString()
         params.Date = new Date().toString()
+        params.method = request.method.toUpperCase()
+        
         // prepare hyperlinks    
         def href = "$params.URL"
         def links = ["self": ["href": "$params.URL"]]
@@ -64,29 +66,27 @@ class RenderService {
             answer = ["status":params.status, "possibleCause": "Unavailable Domain Server $params.sourceComponent", "message":[xe2]] 
             return answer as JSON
         }       
-
-        if (params.withlinks == "false" ) {
+        if (params.withlinks == "false"  ) {
             params.notes = "To show 'links' include in the headers or in request 'withlinks=true'."
             answer = ["header":params, "body":resp.json]
         }
         else {
             params.notes = "To hide 'links' include in the headers or in request 'withlinks=false'."
             answer = ["header":params, "body":resp.json, "links": links ]
-//            answer = ["header":params, "request": request, "links": links, "body":resp.json]
         }
         
         // Keep Audit in CouchDB
         try {
             if (entities.Component.findByName("Auditor").isActive) {
-                // store in the auditdb (CouchDB)
+         // store in the auditdb (CouchDB)
                 def restAudit = new RestBuilder()
                 def url = entities.Component.findByName("Auditor").baseURL + "/$params.reqID"
-                answer.links += ["audit":["href" : "$url"]]
-//                answer.header.auditRec = "$url"
+                answer.header.auditRec = "$url"
                 def respAudit = restAudit.put("$url"){
                     contentType "application/json"
-                    json {answer}
+                    json {["header":params, "body":resp.json]} 
                 }
+                answer.links += ["audit":["href" : "$url"]]
             }            
         }
         catch(Exception e3) {

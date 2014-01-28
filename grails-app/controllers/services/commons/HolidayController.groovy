@@ -2,8 +2,6 @@ package services.commons
 import grails.converters.JSON
 
 class HolidayController extends BaseController {
-    def XRenderService        
-    def XBuildLinksService
 
     def index() { redirect(action: "list", params: params) }
     
@@ -26,12 +24,12 @@ class HolidayController extends BaseController {
             def uri = "/holiday/getByIso2?iso2="+ iso2.toUpperCase()  //internal requestt to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = XRenderService.hostApp(request)
-            params.URL =  XRenderService.URL(request) 
+            params.host = RenderService.hostApp(request)
+            params.URL =  RenderService.URL(request) 
             params.URL += "?iso2="+ iso2.toUpperCase()
-            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render XRenderService.serviceMethod(params, request) 
+            render RenderService.serviceMethod(params, request) 
             }
         }       
 
@@ -48,12 +46,12 @@ class HolidayController extends BaseController {
             def uri = "/holiday/getYearHolidays?iso2="+ iso2.toUpperCase() + "&year=$currentYear"  //internal requestt to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = XRenderService.hostApp(request)
-            params.URL =  XRenderService.URL(request) 
+            params.host = RenderService.hostApp(request)
+            params.URL =  RenderService.URL(request) 
             params.URL += "?iso2="+ iso2.toUpperCase() + "&year=$currentYear"
-            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render XRenderService.serviceMethod(params, request) 
+            render RenderService.serviceMethod(params, request) 
             }        
     }
     

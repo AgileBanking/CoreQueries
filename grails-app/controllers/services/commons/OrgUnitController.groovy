@@ -2,8 +2,6 @@ package services.commons
 import grails.converters.JSON
 
 class OrgUnitController extends BaseController {
-    def XRenderService        
-    def XBuildLinksService
     
     static allowedMethods = [
         get: "GET",
@@ -22,12 +20,12 @@ class OrgUnitController extends BaseController {
             def uri = "/orgUnit/getByCode?code="+ code.toUpperCase()  //internal requestt to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = XRenderService.hostApp(request)
-            params.URL =  XRenderService.URL(request) 
+            params.host = RenderService.hostApp(request)
+            params.URL =  RenderService.URL(request) 
             params.URL += "?code="+ code.toUpperCase()
-            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render XRenderService.serviceMethod(params, request) 
+            render RenderService.serviceMethod(params, request) 
             }
         }     
 
@@ -42,12 +40,12 @@ class OrgUnitController extends BaseController {
             def uri = "/orgUnit/getOrgUnitType?id=$id"  //internal request to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = XRenderService.hostApp(request)
-            params.URL =  XRenderService.URL(request) 
+            params.host = RenderService.hostApp(request)
+            params.URL =  RenderService.URL(request) 
             params.URL += "?id=$id"
-            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render XRenderService.serviceMethod(params, request) 
+            render RenderService.serviceMethod(params, request) 
             }
         }         
         
