@@ -2,6 +2,7 @@ package services.commons
 
 import grails.converters.JSON
 abstract class BaseController {
+
     static allowedMethods = [
         index:              "GET",
         get:                "GET", 

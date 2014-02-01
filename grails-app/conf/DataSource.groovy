@@ -8,8 +8,8 @@ dataSource {
     // MySQL
     pooled = true
     driverClassName = "com.mysql.jdbc.Driver"
-    username = "root" //  "admin1" 
-    password = "master" //  "admin1pwd"   "Master@21"
+    username = "agiler" //  "root" 
+    password = "agiler" //  "admin1pwd"   "Master@21"
 //    password = "bitnami"
 
 }
