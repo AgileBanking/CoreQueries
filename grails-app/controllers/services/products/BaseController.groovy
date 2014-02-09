@@ -1,7 +1,13 @@
 package services.products
 
+import grails.plugins.rest.client.RestBuilder
+import static org.springframework.http.HttpStatus.*
+import grails.transaction.Transactional
+import org.codehaus.groovy.grails.web.json.*
 import grails.converters.JSON
+
 abstract class BaseController {
+
     static allowedMethods = [
         index:              "GET",
         get:                "GET", 
@@ -14,8 +20,9 @@ abstract class BaseController {
     def index() { redirect(action: "shortList", params: params) }
     
     private sourceComponent() {"Products"}
-//    private casheControl() {"public, max-age=5" } // 72000 for 20 hours
-    def casheControl() {"private, no-cache, no-store" }
+//    def casheControl() {"public, max-age=5" } // 72000 for 20 hours with "If-None-Match"
+//    def casheControl() {"private, no-cache, no-store" } with "If-None-Match"
+    def casheControl() {"public, max-age=300" } // re-read it after 5' with "If-None-Match" 
     
     def RenderService
     def BuildLinksService
@@ -106,7 +113,7 @@ abstract class BaseController {
             params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
         }
-        params.hide = ["id", "lastUpdated", "dateCreated", "version", "recStatus"]
+        params.hide = ["id", "version"]
         params.sourceURI = "$uri"  
         params.hideclass = true
         params.URL =  RenderService.URL(request) 
@@ -123,21 +130,62 @@ abstract class BaseController {
         result.links= params.links            
         render result as JSON
     }     
-
+    
+    // returns an array with extra links to be attached in the response by the caller
+    def extraLinks() {
+        return [:]
+    }
+    
+    private keepAudit(answer) {
+        try {
+            if (entities.Component.findByName("Auditor").isActive) {
+         // store in the auditdb (CouchDB)
+                def restAudit = new RestBuilder()
+                def url = entities.Component.findByName("Auditor").baseURL + "/$params.reqID"
+                answer.header.auditRec = "$url"
+                def respAudit = restAudit.put("$url"){
+                    contentType "application/json"
+                    json {["header":answer.params, "body":answer.body]} 
+                }
+                answer.links += ["audit":["href" : "$url"]]
+            }            
+        }
+        catch(Exception e3) {
+            answer.header.error="$e3.message" 
+        }        
+    }
     private renderNow() {
+        params."Cashe-Control" = casheControl()
+        response.setHeader("Cache-Control",params."Cashe-Control")
+        response.setHeader("ETag",params.ETag)          
         def answer = RenderService.prepareAnswer(params, request)   
         if ( params.status == 304) { // Not Modified: return the shortest possible answer without decoration
             render status:"$params.status"
             return
+        }        
+        
+        // Keep Audit
+        try {
+            if (entities.Component.findByName("Auditor").isActive) {
+         // store in the auditdb (CouchDB)
+                def restAudit = new RestBuilder()
+                def url = entities.Component.findByName("Auditor").baseURL + "/$params.reqID"
+                answer.header.auditRec = "$url"
+                def respAudit = restAudit.put("$url"){
+                    contentType "application/json"
+                    json {["header":answer.header, "body":answer.body]} 
+                }
+                answer.links += ["audit":["href" : "$url"]]
+            }            
         }
-        params."Cashe-Control" = casheControl()
-        response.setHeader("Cache-Control",params."Cashe-Control")
-        response.setHeader("ETag",params.ETag)          
-        render (contentType: "application/json", text:answer, status:params.status, ETag:params.ETag,"Cache-Control":params."Cashe-Control")         
-    }
-    
-    // returns an array with extra links to be attached in the response by the caller
-    def extraLinks() {
-        def links = [:]
+        catch(Exception e3) {
+            answer.header.error="$e3.message" 
+        }
+        // sort entries keeping the top entries as ordered
+        answer.header = answer.header.sort {it.key}
+        answer.body = answer.body.sort {it.key}
+        if (answer.links) {answer.links = answer.links.sort {it.key}}
+        
+        render (contentType: "application/json", text:answer as JSON, status:params.status, ETag:params.ETag,"Cache-Control":params."Cashe-Control")         
     }
 }

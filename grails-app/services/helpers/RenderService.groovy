@@ -60,16 +60,16 @@ class RenderService {
         catch(Exception e2) {
             def xe2 = e2.toString() //.message.split(':')
             params.status = 503
-            answer = ["status":params.status, "possibleCause": "Unavailable Domain Server $params.sourceComponent", "message":[xe2]] 
-            return answer as JSON
+            answer = ["header": params, "body":["possibleCause": "Unavailable Domain Server $params.sourceComponent", "message":[xe2]]]
+            return answer 
         }       
         if (params.withlinks == "false"  ) {
             params.notes = "To show 'links' include in the headers or in request 'withlinks=true'."
-            answer = ["header":params, "body":resp.json]
+            answer = ["header":params, "body":resp.json] 
         }
         else {
             params.notes = "To hide 'links' include in the headers or in request 'withlinks=false'."
-            answer = ["header":params, "body":resp.json, "links": links ]
+            answer = ["header":params, "body":resp.json, "links": links ] 
         }
         
         // Keep Audit in CouchDB
