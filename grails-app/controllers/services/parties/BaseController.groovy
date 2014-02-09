@@ -19,14 +19,18 @@ abstract class BaseController {
     def RenderService
     def BuildLinksService
           
-    def get(Long id) { 
-        if (params.id==null || !params.id.isLong() ) {
+    def get(String id) { 
+        // URI: /person/get?id=Pdf6d9cc2-3efd-45b8-a502-f70dfc66ea9f
+        println "id[1]=$params.id"
+        if (params.id==null ) {
             response.status = 400 // 400 Bad Request`
             def answer = ["error":["status":"400", "id":"$params.id"]]
             render answer as JSON
         }
         else {
-            params.sourceURI = "/$params.controller/show/$id" + ".json" //internal request to domains
+            println "id[2]=$params.id" 
+            params.sourceURI = "/$params.controller/show/$params.id" + ".json" //internal request to domains
+            println params.sourceURI
             params.sourceComponent=sourceComponent()
             params.collection = false
             params.host = RenderService.hostApp(request) 
@@ -37,7 +41,7 @@ abstract class BaseController {
             }
             params.hideclass = true
             params.URL =  RenderService.URL(request) 
-            params.URL += "?id=$id"
+            params.URL += "?id=$params.id"
             renderNow()
 //            render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
             }
@@ -103,7 +107,7 @@ abstract class BaseController {
             params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
         }
-        params.hide = ["id", "version"]
+        params.hide = ["id", "lastUpdated", "dateCreated", "version", "recStatus"]
         params.sourceURI = "$uri"  
         params.hideclass = true
         params.URL =  RenderService.URL(request) 

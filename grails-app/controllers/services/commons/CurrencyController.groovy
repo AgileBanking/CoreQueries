@@ -3,8 +3,8 @@ package services.commons
 import grails.converters.JSON
 
 class CurrencyController extends BaseController {
-//    def RenderService        
-//    def BuildLinksService
+    def XRenderService        
+    def XBuildLinksService
     
     def getByIso3(String iso3) {
         // ../CoreQueries/currency/get?iso3=EUR
@@ -17,12 +17,12 @@ class CurrencyController extends BaseController {
             def uri = "/currency/getByIso3?iso3="+ iso3.toUpperCase()  //internal requestt to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = RenderService.hostApp(request)
-            params.URL =  RenderService.URL(request) 
+            params.host = XRenderService.hostApp(request)
+            params.URL =  XRenderService.URL(request) 
             params.URL += "?iso3="+ iso3.toUpperCase()
-            params.links = BuildLinksService.controllerLinks(params, request)
+            params.links = XBuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            renderNow()  //render RenderService.serviceMethod(params, request) 
+            renderNow()  //render XRenderService.serviceMethod(params, request) 
             }
         }       
         

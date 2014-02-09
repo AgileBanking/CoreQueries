@@ -2,12 +2,10 @@ package services.commons
 import grails.converters.JSON
 
 class OrgUnitController extends BaseController {
+    def XRenderService
+    def XBuildLinksService
     
-    static allowedMethods = [
-        get: "GET",
-        getByCode:'GET', 
-        shortList:'GET', 
-        list:'GET']
+    static allowedMethods = [getByCode:'GET']
 
     def getByCode(String code) {
         // ../CoreQueries/orgUnit/get?code=EUR
@@ -20,12 +18,12 @@ class OrgUnitController extends BaseController {
             def uri = "/orgUnit/getByCode?code="+ code.toUpperCase()  //internal requestt to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = RenderService.hostApp(request)
-            params.URL =  RenderService.URL(request) 
+            params.host = XRenderService.hostApp(request)
+            params.URL =  XRenderService.URL(request) 
             params.URL += "?code="+ code.toUpperCase()
-            params.links = BuildLinksService.controllerLinks(params, request)
+            params.links = XBuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render RenderService.serviceMethod(params, request) 
+            renderNow()
             }
         }     
 
@@ -40,12 +38,12 @@ class OrgUnitController extends BaseController {
             def uri = "/orgUnit/getOrgUnitType?id=$id"  //internal request to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = RenderService.hostApp(request)
-            params.URL =  RenderService.URL(request) 
+            params.host = XRenderService.hostApp(request)
+            params.URL =  XRenderService.URL(request) 
             params.URL += "?id=$id"
-            params.links = BuildLinksService.controllerLinks(params, request)
+            params.links = XBuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render RenderService.serviceMethod(params, request) 
+            render XRenderService.serviceMethod(params, request) 
             }
         }         
         

@@ -3,11 +3,10 @@ import grails.converters.JSON
 
 class OrgUnitTypeController extends BaseController {
 
-    static allowedMethods = [
-        get: "GET",
-        getByCode:'GET', 
-        listShort:'GET', 
-        list:'GET']
+    def XRenderService
+    def XBuildLinksService
+    
+    static allowedMethods = [getByCode:'GET']
         
     def getByCode(String code) {
         // ../CoreQueries/orgUnit/get?code=EUR
@@ -20,14 +19,14 @@ class OrgUnitTypeController extends BaseController {
             def uri = "/orgUnit/getByCode?code="+ code.toUpperCase()  //internal requestt to domains
             params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.host = RenderService.hostApp(request)
-            params.URL =  RenderService.URL(request) 
+            params.host = XRenderService.hostApp(request)
+            params.URL =  XRenderService.URL(request) 
             params.URL += "?code="+ code.toUpperCase()
-            params.links = BuildLinksService.controllerLinks(params, request)
+            params.links = XBuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
-            render RenderService.serviceMethod(params, request) 
-            }
-        }      
+            renderNow()
+        } 
+    }
         
     def extraLinks(){ 
         def controllerURL = "$params.host/$params.controller"

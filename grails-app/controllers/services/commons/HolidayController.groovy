@@ -5,11 +5,7 @@ class HolidayController extends BaseController {
 
     def index() { redirect(action: "list", params: params) }
     
-    static allowedMethods = [
-        get: "GET",
-        getByIso2:'GET', 
-        shortList:'GET', 
-        list:'GET']
+    static allowedMethods = [getByIso2:'GET']
                 
     def shortList() { redirect(action:"list", params: params) }
     

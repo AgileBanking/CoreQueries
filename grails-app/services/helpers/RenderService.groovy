@@ -21,7 +21,7 @@ class RenderService {
         else {
             links.self += ["alt_href": "$href" + "?withlinks=false"]
         }
-        if (params.links != null) { links += params.links}
+        if (params.links != null) { links += params.links }
         // clean params
         params.remove("links")
         params.remove("URL")
@@ -30,16 +30,13 @@ class RenderService {
         def xref = ""
         def resp, s
         def rest = new RestBuilder()
+//        params.error = "none"
         try {        
             resp = rest.get("$baseURL$params.sourceURI") { 
                 accept "application/json"
                 contentType "application/json"
                 } 
-//            def xj = resp.json[0] as JSON
             params.status = resp.status 
-//            if (params.status == 404) {
-//                return 
-//            }
             if (resp.status < 300 && resp.json.class != null) { 
                 resp.json.remove("class") 
             }
@@ -51,12 +48,12 @@ class RenderService {
             }
             // If not modified return nothing  
             def md5= MD5(resp.json.toString())
-            def rETag = request.getHeader("If-None-Match")
+            def rETag = request.getHeader("If-None-Match") + ""
 //            println "rETag: $rETag, pTag: $md5" 
             params.ETag = md5 
             if ("$rETag" == "$md5") { 
                 params.status = 304
-                return 
+                return // without auditing
             } 
             
         } 
@@ -76,23 +73,23 @@ class RenderService {
         }
         
         // Keep Audit in CouchDB
-        try {
-            if (entities.Component.findByName("Auditor").isActive) {
-         // store in the auditdb (CouchDB)
-                def restAudit = new RestBuilder()
-                def url = entities.Component.findByName("Auditor").baseURL + "/$params.reqID"
-                answer.header.auditRec = "$url"
-                def respAudit = restAudit.put("$url"){
-                    contentType "application/json"
-                    json {["header":params, "body":resp.json]} 
-                }
-                answer.links += ["audit":["href" : "$url"]]
-            }            
-        }
-        catch(Exception e3) {
-            answer.header.error="$e3.message" 
-        } 
-        return answer as JSON      
+//        try {
+//            if (entities.Component.findByName("Auditor").isActive) {
+//         // store in the auditdb (CouchDB)
+//                def restAudit = new RestBuilder()
+//                def url = entities.Component.findByName("Auditor").baseURL + "/$params.reqID"
+//                answer.header.auditRec = "$url"
+//                def respAudit = restAudit.put("$url"){
+//                    contentType "application/json"
+//                    json {["header":params, "body":resp.json]} 
+//                }
+//                answer.links += ["audit":["href" : "$url"]]
+//            }            
+//        }
+//        catch(Exception e3) {
+//            answer.header.error="$e3.message" 
+//        } 
+        return answer      
     }
     
     def URL(request) {

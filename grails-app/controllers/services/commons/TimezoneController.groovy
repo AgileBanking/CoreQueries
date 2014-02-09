@@ -2,17 +2,15 @@ package services.commons
 import grails.converters.JSON
 class TimezoneController extends BaseController {
 
-static allowedMethods = [
-    get: "GET",
-    getByIso3:'GET', 
-    shortList:'GET', 
-    list:'GET']
+    def XRenderService
+    def XBuildLinksService
+    
+    static allowedMethods = [getByIso3:'GET']
         
     def shortList() { redirect(action:"list", params: params) }   
     
     def getByLocation(String location) {
         // ../CoreQueries/timezone/getByLocation?location=Europe/Athens
-        println "location: $location"
         if (location==null){
             response.status = 400 // 400 Bad Request
             def answer = ["error":["status":"400", "expectedParams":"$location"]]
@@ -20,13 +18,14 @@ static allowedMethods = [
         }
         else {
             def uri = "/timezone/getByLocation?location="+ location.toUpperCase()  //internal requestt to domains
-            println uri
-            params.sourceComponent="Commons"
+            params.sourceComponent=sourceComponent()
             params.sourceURI="$uri" 
-            params.URL =  RenderService.URL(request) 
-            params.URL += "?location="+ location
-//            params.caller = "$request.forwardURI" 
-            render RenderService.serviceMethod(params, request) 
+            params.host = XRenderService.hostApp(request)
+            params.URL =  XRenderService.URL(request) 
+            params.URL += "?location="+ location.toUpperCase()
+            params.links = XBuildLinksService.controllerLinks(params, request)
+            params.links += extraLinks()
+            renderNow()
             }
         }  
    

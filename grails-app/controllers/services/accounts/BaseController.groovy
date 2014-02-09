@@ -1,7 +1,12 @@
-package services.products
+package services.accounts
 
-import grails.converters.JSON
+import static org.springframework.http.HttpStatus.*
+import grails.transaction.Transactional
+import org.codehaus.groovy.grails.web.json.*
+import grails.converters.*
+
 abstract class BaseController {
+
     static allowedMethods = [
         index:              "GET",
         get:                "GET", 
@@ -13,7 +18,7 @@ abstract class BaseController {
         
     def index() { redirect(action: "shortList", params: params) }
     
-    private sourceComponent() {"Products"}
+    private sourceComponent() {"Accounts"}
 //    private casheControl() {"public, max-age=5" } // 72000 for 20 hours
     def casheControl() {"private, no-cache, no-store" }
     
@@ -40,8 +45,7 @@ abstract class BaseController {
             params.recStatus = (params.recStatus ? params.recStatus.toLowerCase() : "Active").capitalize()  
             params.sourceURI = "/$params.controller/show.json?id=$id&recStatus=$params.recStatus"   //internal request to domains
             params.URL += "?id=$id&recStatus=$params.recStatus" 
-            renderNow()
-//            render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
+            renderNow()    
             }
         } 
           
@@ -66,6 +70,7 @@ abstract class BaseController {
 
     def shortList() {
         // ../CoreQueries/currency/shortList
+        println "from shortList"
         params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
         params.URL =  RenderService.URL(request)  
         params.sourceComponent=sourceComponent()
@@ -106,7 +111,7 @@ abstract class BaseController {
             params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
         }
-        params.hide = ["id", "lastUpdated", "dateCreated", "version", "recStatus"]
+        params.hide = ["id", "version"]
         params.sourceURI = "$uri"  
         params.hideclass = true
         params.URL =  RenderService.URL(request) 
@@ -141,3 +146,4 @@ abstract class BaseController {
         def links = [:]
     }
 }
+
