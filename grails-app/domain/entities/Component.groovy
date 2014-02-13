@@ -1,5 +1,5 @@
 package entities
-//import grails.plugins.rest.client.RestBuilder
+
 class Component {   
     String      name
     String      appVersion
@@ -12,6 +12,10 @@ class Component {
 //    String      recStatus = "Active"
     
     String toString()  {"$name"}
+
+    static mapping = {
+        order "name"
+    }
     
     static constraints = {
         name            (unique:true)

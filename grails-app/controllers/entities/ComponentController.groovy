@@ -24,8 +24,10 @@ class ComponentController {
     
     def index()  {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)  
+        params.sort="name"
         respond Component.list(params), model:[componentInstanceTotal: Component.count()]
     }   
+        
 
     def listMethods = {
         def myMap =[:]

@@ -116,7 +116,6 @@ abstract class BaseController {
         params.sourceURI = "$uri"  
         params.hideclass = true
         params.URL =  RenderService.URL(request) 
-        println "1. hide: $params.hide" 
         renderNow()    
     }
     

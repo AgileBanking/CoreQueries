@@ -112,10 +112,11 @@ abstract class BaseController {
             params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()
         }
-        params.hide = ["id", "version"]
+        params.hide = ["id", "version", "dateCreated", "lastUpdated", "recStatus"]
         params.sourceURI = "$uri"  
         params.hideclass = true
         params.URL =  RenderService.URL(request) 
+        println "1. hide: $params.hide" 
         renderNow()    
     }
     
@@ -135,24 +136,6 @@ abstract class BaseController {
         return [:]
     }
     
-    private keepAudit(answer) {
-        try {
-            if (entities.Component.findByName("Auditor").isActive) {
-         // store in the auditdb (CouchDB)
-                def restAudit = new RestBuilder()
-                def url = entities.Component.findByName("Auditor").baseURL + "/$params.reqID"
-                answer.header.auditRec = "$url"
-                def respAudit = restAudit.put("$url"){
-                    contentType "application/json"
-                    json {["header":answer.params, "body":answer.body]} 
-                }
-                answer.links += ["audit":["href" : "$url"]]
-            }            
-        }
-        catch(Exception e3) {
-            answer.header.error="$e3.message" 
-        }        
-    }
     private renderNow() {
         params."Cashe-Control" = casheControl()
         response.setHeader("Cache-Control",params."Cashe-Control")
@@ -165,8 +148,8 @@ abstract class BaseController {
         
         // Keep Audit
         try {
-            if (entities.Component.findByName("Auditor").isActive) {
-         // store in the auditdb (CouchDB)
+            if (entities.Component.findByName("Auditor").isActive) { 
+                // store in the auditdb (CouchDB)
                 def restAudit = new RestBuilder()
                 def url = entities.Component.findByName("Auditor").baseURL + "/$params.reqID"
                 answer.header.auditRec = "$url"

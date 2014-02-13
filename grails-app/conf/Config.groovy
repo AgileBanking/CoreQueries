@@ -20,7 +20,10 @@
 // Include version for both XML and JSON output.
 grails.converters.domain.include.version = true
 
-grails.plugin.databasemigration.dbDocController.enabled = true
+grails.plugins.springsecurity.rejectIfNoRule = true
+
+// Spring Security 
+grails.plugins.springsecurity.auth.forceHttps = true
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
@@ -64,7 +67,9 @@ grails.views.default.codec = "html"
 
 // The default scope for controllers. May be prototype, session or singleton.
 // If unspecified, controllers are prototype scoped.
-grails.controllers.defaultScope = 'singleton'
+//grails.controllers.defaultScope = 'singleton' // Only one instance of the controller ever exists (recommended for actions as methods)
+grails.controllers.defaultScope = 'prototype' //  A new controller will be created for each request (recommended for actions as Closure properties)
+//grails.controllers.defaultScope = 'session ' //  One controller is created for the scope of a user session
 
 // GSP settings
 grails {

@@ -73,8 +73,8 @@ class AdminController {
         if (urlConnection.connected) {        
             if (ComponentName == "Core" || ComponentName==null) {
                 def url = "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/" 
-                url += "[Clients]<>0..*-0..*>[CoreQueries],[Clients]<>0..*-0..*>[CoreUpdates],[CoreUpdates]<>0..*-0..*>[CoreQueries],[CoreQueries]<>0..*-0..*>[Accounts], [CoreQueries]<>0..*-0..*>[Commons], [CoreQueries]<>0..*-0..*>[Parties], [CoreQueries]<>0..*-0..*>[Products],[CoreQueries]<>0..*-0..*>[API Repository],"
-                url += "[CoreUpdates]<>0..*-0..*>[Accounts], [CoreUpdates]<>0..*-0..*>[Commons], [CoreUpdates]<>0..*-0..*>[Parties], [CoreUpdates]<>0..*-0..*>[Products],[CoreUpdates]<>0..*-0..*>[API Repository]"       
+                url += "[Clients]<>0..*-0..*>[Composer],[Composer]<>0..*-0..*>[CoreQueries],[Composer]<>0..*-0..*>[CoreUpdates],[CoreUpdates]<>0..*-0..*>[CoreQueries],[CoreQueries]<>0..*-0..*>[Accounts], [CoreQueries]<>0..*-0..*>[Commons], [CoreQueries]<>0..*-0..*>[Parties], [CoreQueries]<>0..*-0..*>[Products],[CoreQueries]<>0..*-0..*>[API Repository],"
+                url += "[Clients]<>0..*-0..*>[CoreQueries],[Clients]<>0..*-0..*>[CoreUpdates],[CoreUpdates]<>0..*-0..*>[Accounts], [CoreUpdates]<>0..*-0..*>[Commons], [CoreUpdates]<>0..*-0..*>[Parties], [CoreUpdates]<>0..*-0..*>[Products],[CoreUpdates]<>0..*-0..*>[API Repository]"       
                 redirect (url:"$url")
                 return
             }

@@ -13,7 +13,7 @@ class BootStrap {
        }
        
        if (entities.Component.count()==0) {
-           def audit =  new entities.Component(name:"Auditor",      appVersion:"1.0", notes:"CouchDB", baseURL:"http://localhost:5984/auditdb", supportAdmin:false, isActive:false).save()
+           def audit =  new entities.Component(name:"Auditor",      appVersion:"1.0", notes:"CouchDB", baseURL:"http://localhost:5984/auditdb").save()
            def coreQ =  new entities.Component(name:"CoreQueries",  appVersion:"1.0", baseURL:"http://localhost:9981/CoreQueries").save()
            def coreU =  new entities.Component(name:"CoreCommands",  appVersion:"1.0", baseURL:"http://localhost:9982/CoreCommands").save()
            def co =     new entities.Component(name:"Commons",      appVersion:"1.0", baseURL:"http://localhost:9901/Commons").save()

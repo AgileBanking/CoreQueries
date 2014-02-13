@@ -47,11 +47,11 @@ class RenderService {
                 params.remove("hide")
             }
             // If not modified return nothing  
-            def md5= MD5(resp.json.toString())
-            def rETag = request.getHeader("If-None-Match") + ""
-//            println "rETag: $rETag, pTag: $md5" 
-            params.ETag = md5 
-            if ("$rETag" == "$md5") { 
+            def etag = makeEtag(resp.json.toString())
+            def rETag = request.getHeader("If-None-Match") + "" 
+//            println "rETag: $rETag, pTag: $etag" 
+            params.ETag = etag 
+            if ("$rETag" == "$etag") { 
                 params.status = 304
                 return // without auditing
             } 
@@ -72,23 +72,6 @@ class RenderService {
             answer = ["header":params, "body":resp.json, "links": links ] 
         }
         
-        // Keep Audit in CouchDB
-//        try {
-//            if (entities.Component.findByName("Auditor").isActive) {
-//         // store in the auditdb (CouchDB)
-//                def restAudit = new RestBuilder()
-//                def url = entities.Component.findByName("Auditor").baseURL + "/$params.reqID"
-//                answer.header.auditRec = "$url"
-//                def respAudit = restAudit.put("$url"){
-//                    contentType "application/json"
-//                    json {["header":params, "body":resp.json]} 
-//                }
-//                answer.links += ["audit":["href" : "$url"]]
-//            }            
-//        }
-//        catch(Exception e3) {
-//            answer.header.error="$e3.message" 
-//        } 
         return answer      
     }
     
@@ -103,9 +86,17 @@ class RenderService {
         return x.substring(0,x.indexOf("$appName") + appName.size())  
     }      
     
-    def MD5(String s) {
-        MessageDigest digest = MessageDigest.getInstance("MD5")
-        digest.update(s.bytes);
-        new BigInteger(1, digest.digest()).toString(16).padLeft(32, '0')        
+    def makeEtag(String s) {
+//        return s.encodeAsMD5()
+        return s.encodeAsSHA1() // encodeAsSHA256()
+        
+//        return org.apache.commons.codec.digest.DigestUtils.sha256Hex(s)
+        
+//        MessageDigest digest = MessageDigest.getInstance("MD5")
+//        digest.update(s.bytes);
+//        new BigInteger(1, digest.digest()).toString(16)//.padLeft(32, '0')    
+        
+//        MessageDigest digest = MessageDigest.getInstance("SHA-256")
+//        byte[] hash = digest.digest(text.getBytes("UTF-8"));        
     }
 }
