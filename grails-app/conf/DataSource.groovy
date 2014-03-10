@@ -8,9 +8,9 @@ dataSource {
     // MySQL
     pooled = true
     driverClassName = "com.mysql.jdbc.Driver"
-    username = "root" //  "root" 
-    password = "agiler" //  "admin1pwd"   "Master@21"
-//    password = "bitnami"
+    username = "root" 
+    password = "agiler" 
+
 
 }
 hibernate {
@@ -28,7 +28,6 @@ environments {
 //            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
 //            url = "jdbc:h2:coreDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
             url = "jdbc:mysql://localhost:3306/coredb"   
-//            url = "jdbc:mysql://commonsdb.cgol0a13k4df.us-east-1.rds.amazonaws.com:3306/commons"
         }
     }
     test {
@@ -44,15 +43,24 @@ environments {
             url = "jdbc:h2:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
 //            url = "jdbc:mysql://localhost:3306/commons" 
             properties {
-               maxActive = -1
-               minEvictableIdleTimeMillis=1800000
-               timeBetweenEvictionRunsMillis=1800000
-               numTestsPerEvictionRun=3
-               testOnBorrow=true
-               testWhileIdle=true
-               testOnReturn=false
-               validationQuery="SELECT 1"
-               jdbcInterceptors="ConnectionState"
+               // See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
+               jmxEnabled = true
+               initialSize = 5
+               maxActive = 50
+               minIdle = 5
+               maxIdle = 25
+               maxWait = 10000
+               maxAge = 10 * 60000
+               timeBetweenEvictionRunsMillis = 5000
+               minEvictableIdleTimeMillis = 60000
+               validationQuery = "SELECT 1"
+               validationQueryTimeout = 3
+               validationInterval = 15000
+               testOnBorrow = true
+               testWhileIdle = true
+               testOnReturn = false
+               jdbcInterceptors = "ConnectionState;StatementCache(max=200)"
+               defaultTransactionIsolation = java.sql.Connection.TRANSACTION_READ_COMMITTED
             }
         }
     }

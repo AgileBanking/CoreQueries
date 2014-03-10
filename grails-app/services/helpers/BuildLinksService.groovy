@@ -17,7 +17,7 @@ class BuildLinksService {
                 "body":"@create", "notes":"Using the empty resource from 'create' and using PUT create new resource. If you have not in cache, get the body from the 'create'. For update a resource, retrieved with 'get' use POST to save its new state."]]
             links += ["relatedLinks": ["href": "$controllerURL/relatedLinks", "notes":"Returns a list with the most frequent links."]]
             links += ["theBank": ["href": "$params.host/theBank", "notes":"The unique resource that holds most the operational profile of the Bank."]]
-            links += ["repo": ["href": "$params.host/home", "notes": " The repository of hypermedia links of the $params.host"]]
+            links += ["repo": ["href": "$params.host/admin/repo", "notes": " The repository of hypermedia links of the $params.host"]]
             links += ["refreshCache": ["href": "$params.host/refreshCache", "notes":"Clears all caches (client and proxies). Use it after a system/client disruption."]]
             return links        
     } 

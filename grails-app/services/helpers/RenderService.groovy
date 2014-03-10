@@ -4,6 +4,7 @@ import grails.converters.*
 import java.security.MessageDigest 
 
 class RenderService {
+    
     static transactional = false
     
     def prepareAnswer(params, request) {
@@ -82,8 +83,10 @@ class RenderService {
     
     def hostApp(request) {
         def appName = entities.Component.findByName("CoreQueries").baseURL 
-        def x = request.getRequestURL()  
-        return x.substring(0,x.indexOf("$appName") + appName.size())  
+//        def x = request.getRequestURL()  
+//        println "appName= $appName x=$x"
+//        return x.substring(0,x.indexOf("$appName") + appName.size())  
+        return appName
     }      
     
     def makeEtag(String s) {

@@ -21,10 +21,11 @@ abstract class BaseController {
     private sourceComponent() {"Commons"}
 //    def casheControl() {"public, max-age=5" } // 72000 for 20 hours
 //    def casheControl() {"private, no-cache, no-store" }
-    def casheControl() {"public, max-age=1800" } // re-read it after 1/2 hour
+    def casheControl() {"public, max-age=60" } // re-read it after 60"
     
     def RenderService
     def BuildLinksService
+    def AccessControlService
           
     def get(String id) { 
         if (params.id==null || !params.id.isLong() ) {
@@ -52,6 +53,12 @@ abstract class BaseController {
         } 
           
     def list() {
+//        def token = request.getHeader("Token")
+//        println "And now authorize me with toke: $token"
+//
+//        println AccessControlService.authenticate(token)
+
+//        params.token = token
         params.sourceComponent=sourceComponent()
         params.collection = true
         params.host = RenderService.hostApp(request)
@@ -86,6 +93,13 @@ abstract class BaseController {
         }    
 
     def schema() {
+//        def allowedRoles = ["ADMIN", "AUDITOR"]
+//        def token = request.getHeader("Token")
+//        println "And now authorize me with toke: $token"
+
+//        println AccessControlService.authenticate(token)
+
+//        params.token = token        
         def uri = "/admin/JSD?ComponentName=Parties&ClassName=" + params.controller.capitalize() //internal request to domains
         params.sourceComponent=sourceComponent()
         params.collection = false
@@ -103,6 +117,7 @@ abstract class BaseController {
     
     def create() {
         def uri = "/$params.controller/create.json" //internal request to domains
+//        println uri
         params.sourceComponent=sourceComponent()
         params.collection = false
         params.host = RenderService.hostApp(request) 
@@ -136,6 +151,7 @@ abstract class BaseController {
     }
     
     private renderNow() {
+//        println "And now render"
         params."Cashe-Control" = casheControl()
         response.setHeader("Cache-Control",params."Cashe-Control")
         response.setHeader("ETag",params.ETag)          

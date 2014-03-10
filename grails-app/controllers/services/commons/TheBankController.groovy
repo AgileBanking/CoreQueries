@@ -4,6 +4,8 @@ import grails.plugins.rest.client.RestBuilder
 
 class TheBankController extends BaseController {
     
+    def RenderService
+    
     static allowedMethods = [
         getBank:    'GET',
         iban:       'GET',
@@ -29,50 +31,50 @@ class TheBankController extends BaseController {
         return
     }     
     
-    def iban() {
-        params.id = thisBank().iBAN.id
-        redirect (controller:"Iban", action:"get", params:params )
-        return
-    }   
-    
-    def currency() {
-        params.id = thisBank().iBAN.id
-        redirect (controller:"currency", action:"get", params:params )
-        return        
-        
-    }
-    
-    def hostCountry() {
-        params.id = thisBank().iBAN.id
-        redirect (controller:"country", action:"get", params:params )
-        return        
-    }
-    
-    def orgUnit() {
-        params.id = thisBank().iBAN.id
-        redirect (controller:"orgUnit", action:"get", params:params )
-        return        
-    }
-    
-    def channels() {
-        
-    }
-    
-    def hqTimeZone() {
-        params.id = thisBank().iBAN.id
-        redirect (controller:"timeZone", action:"get", params:params )
-        return
-    }
-    
-    def timeZones() {
-        
-    }
-    
-    def officialLanguage() {
-        params.id = thisBank().iBAN.id
-        redirect (controller:"language", action:"get", params:params )
-        return        
-    }
+//    def iban() {
+//        params.id = thisBank().iban.id
+//        redirect (controller:"Iban", action:"get", params:params )
+//        return
+//    }   
+//    
+//    def currency() {
+//        params.id = thisBank().currency.id 
+//        redirect (controller:"currency", action:"get", params:params )
+//        return        
+//        
+//    }
+//    
+//    def hostCountry() {
+//        params.id = thisBank(request).hostCountry.id
+//        redirect (controller:"Country", action:"get", params:params )
+//        return        
+//    }
+//    
+//    def orgUnit() {
+//        params.id = thisBank().OrgUnit.id
+//        redirect (controller:"orgUnit", action:"get", params:params )
+//        return        
+//    }
+//    
+//    def channels() {
+//        
+//    }
+//    
+//    def hqTimeZone() {
+//        params.id = thisBank().hqTimeZone.id
+//        redirect (controller:"timeZone", action:"get", params:params )
+//        return
+//    }
+//    
+//    def timeZones() {
+//        
+//    }
+//    
+//    def officialLanguage() {
+//        params.id = thisBank().officialLanguage.id
+//        redirect (controller:"language", action:"get", params:params )
+//        return        
+//    }
     
     def extraLinks(){ 
         def controllerURL = "$params.host/$params.controller"
@@ -89,7 +91,7 @@ class TheBankController extends BaseController {
         return links 
     }    
     
-    private thisBank() {
+    private thisBank(request) {
         params.sourceComponent=sourceComponent()
         params.sourceURI="/theBank/" 
         params.host = RenderService.host(request)

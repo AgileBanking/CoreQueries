@@ -46,8 +46,7 @@ abstract class BaseController {
             params.recStatus = (params.recStatus ? params.recStatus.toLowerCase() : "Active").capitalize()  
             params.sourceURI = "/$params.controller/show.json?id=$id&recStatus=$params.recStatus"   //internal request to domains
             params.URL += "?id=$id&recStatus=$params.recStatus" 
-            renderNow()
-//            render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
+            renderNow()    
             }
         } 
           
@@ -116,7 +115,6 @@ abstract class BaseController {
         params.sourceURI = "$uri"  
         params.hideclass = true
         params.URL =  RenderService.URL(request) 
-        println "1. hide: $params.hide" 
         renderNow()    
     }
     

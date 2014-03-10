@@ -36,7 +36,9 @@ class AdminController {
           <li><a href="XSD" target="_blank">Data
         Model in XML Schema[*]</a></li>
           <li><a href="JSD" target="_blank">Data
-        Model in JSON Schema[*]</a></li>
+        Model in JSON Schema[*]</a></li>\n\
+          <li><a href="modelDiagram" target="_blank">Model
+        Diagram</a></li>
           <li><a href="relationsDiagram" target="_blank">Relations
         Diagram</a></li>
           <ol>
@@ -59,7 +61,7 @@ class AdminController {
         render (html)
     }
     
-    def relationsDiagram(String ComponentName)  {
+    def modelDiagram()  {
         // check if internet connection is available
         URL html = new URL('http://yuml.me');
         URLConnection urlConnection = html.openConnection();
@@ -71,25 +73,79 @@ class AdminController {
         }
         // if there is internet connection ask yUML.me to draw the diagram, else use the local image
         if (urlConnection.connected) {        
-            if (ComponentName == "Core" || ComponentName==null) {
-                def url = "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/" 
-                url += "[Clients]<>0..*-0..*>[Composer],[Composer]<>0..*-0..*>[CoreQueries],[Composer]<>0..*-0..*>[CoreUpdates],[CoreUpdates]<>0..*-0..*>[CoreQueries],[CoreQueries]<>0..*-0..*>[Accounts], [CoreQueries]<>0..*-0..*>[Commons], [CoreQueries]<>0..*-0..*>[Parties], [CoreQueries]<>0..*-0..*>[Products],[CoreQueries]<>0..*-0..*>[API Repository],"
-                url += "[Clients]<>0..*-0..*>[CoreQueries],[Clients]<>0..*-0..*>[CoreUpdates],[CoreUpdates]<>0..*-0..*>[Accounts], [CoreUpdates]<>0..*-0..*>[Commons], [CoreUpdates]<>0..*-0..*>[Parties], [CoreUpdates]<>0..*-0..*>[Products],[CoreUpdates]<>0..*-0..*>[API Repository]"       
+                def url = "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/"  
+                url += "[Composer]<>0..*-0..*>[CoreQueries],[Composer]<>0..*-0..*>[CoreCommands],[CoreCommands]<>0..*-0..*>[CoreQueries],[CoreQueries]<>0..*-0..*>[Accounts], [CoreQueries]<>0..*-0..*>[Commons], [CoreQueries]<>0..*-0..*>[Parties], [CoreQueries]<>0..*-0..*>[Products],[CoreQueries]<>0..*-0..*>[API Repository],"
+                url += "[CoreCommands]<>0..*-0..*>[Accounts], [CoreCommands]<>0..*-0..*>[Commons], [CoreCommands]<>0..*-0..*>[Parties], [CoreCommands]<>0..*-0..*>[Products],[CoreCommands]<>0..*-0..*>[API Repository],[Policies]<-[CoreQueries],[Policies]<-[CoreCommands],[Policies]<-[Composer],"       
+                url += "[Logging]<>0..*-0..*>[APE (Asynch Processing Engine)],[Policies]<>0..*-0..*>[RBAC],[Policies]<>0..*-0..*>[Scheduler],[Scheduler]<>0..*-0..*>[MailManager], [Scheduler]<>0..*-0..*>[ReportingEngine],[Scheduler]<>0..*-0..*>[APE (Asynch Processing Engine)],[Policies]<>0..*-0..*>[Logging],"
+                url += "[Clients]<>0..*-0..*>[Composer],[Clients]<>0..*-0..*>[CoreQueries],[Clients]<>0..*-0..*>[CoreCommands],[Clients]<>0..*-0..*>[BizProcessor],[BizProcessor]<>0..*-0..*>[Composer],[BizProcessor]<>0..*-0..*>[CoreQueries],[BizProcessor]<>0..*-0..*>[CoreCommands]"
                 redirect (url:"$url")
                 return
             }
-            else {
-                def component = entities.Component.findByName(ComponentName) 
-                if (component.supportAdmin){
-                    def baseURL = component.baseURL
-                    redirect (url: "$baseURL" + "/admin/relationsDiagram")
-                    return
+        else {
+            // Show the local diagram
+            def modeldiagram = """
+                <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+                <html>
+                <head>
+                  <meta content="text/html; charset=ISO-8859-1"
+                 http-equiv="content-type">
+                  <title></title>
+                </head>
+                <body>\n\
+                <img src="${resource(dir: 'images', file: 'ModelDiagram.png')}" 
+                     alt="Relations Diagram of Commons entites "/><br>
+                </body>
+                </html>
+            """ 
+            render (modeldiagram)
+        }            
+    }   
+    
+    def relationsDiagram() {
+        // check if internet connection is available
+        URL html = new URL('http://yuml.me');
+        URLConnection urlConnection = html.openConnection();
+        try {
+            urlConnection.connect()
+        }
+        catch(e1) {
+            println e1.message
+        }
+        // if there is internet connection ask yUML.me to draw the diagram, else use the local image
+        if (urlConnection.connected) {
+            def domainClasses = grailsApplication.getArtefacts("Domain")
+            def classes = ''
+            def classrelation = ''
+            def relationships = ''
+            def proType = ''
+            domainClasses.each { domainClass ->
+                def relations = "" // [$domainClass.name], "  // Include those are not part of relations
+                def classDef = ""
+                domainClass.properties.each{prop ->
+                    proType = resolveName(prop.type.toString())
+                        if (prop.isAssociation()){
+                            // if its association only show the owning side
+                            if(!prop.isBidirectional() || prop.isOwningSide() || proType == domainClass.name )
+                                classrelation = getRelationship(domainClass.name, prop)
+                                if (!relationships.contains(classrelation)) {
+                                    relations = "$relations \n$classrelation" 
+                                }
+                        } else {
+                            // Domain class properties 
+                            classDef += '\n' + resolveName(prop.getType().getName()) + ' ' + prop.name + ';' 
+                        }
                 }
-                else {
-                    response.status = 404
-                    render "<p>'$ComponentName' does not suport Remote Admin.</p><p> Ask the Relations Diagram from the component, directly.</p>"
+                if (!relationships.contains(relations.trim())){
+                    relationships += relations
+                }
+            } 
+            // Include those are not part of relations (orphans)
+            domainClasses.each { domainClass ->
+                if (!relationships.contains(domainClass.name.trim())) {
+                    relationships += "[$domainClass.name],"  
                 }
             }
+            redirect(url: "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/" + classes + relationships)            
         }
         else {
             // Show the local diagram
@@ -108,8 +164,9 @@ class AdminController {
                 </html>
             """ 
             render (reldiagram)
-        }            
-    }   
+        }        
+    }
+    
     
     def componentsActionsByController(String ComponentName, String ControllerName) {
         // example: /server/ComponentsActionsByController?ComponentName=Commons&ControllerName=Currency
