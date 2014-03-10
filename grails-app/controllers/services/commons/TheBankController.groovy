@@ -4,21 +4,21 @@ import grails.plugins.rest.client.RestBuilder
 
 class TheBankController extends BaseController {
     
-    def RenderService
+    def XRenderService
+    def XBuildLinksService
     
     static allowedMethods = [
-        getBank:    'GET',
-        iban:       'GET',
-        currency:   'GET',
-        hostCountry:'GET',
-        orgUnit:    'GET',
-        channels:   'GET',
-        hqTimeZone: 'GET',
-        timeZones:  'GET',
+        getBank:        'GET',
+        iban:           'GET',
+        baseCurrency:   'GET',
+        hostCountry:    'GET',
+        orgTreeRoot:    'GET',
+        channels:       'GET',
+        hqTimeZone:     'GET',
         officialLanguage:'GET'
     ]
         
-    def index() { redirect(action: "getBank", params: params) }
+    def index() { redirect(action: "getBank", params: params ) }
     
     def shortList() { 
         params.code = 303 // See Other
@@ -31,86 +31,61 @@ class TheBankController extends BaseController {
         return
     }     
     
-//    def iban() {
-//        params.id = thisBank().iban.id
-//        redirect (controller:"Iban", action:"get", params:params )
-//        return
-//    }   
-//    
-//    def currency() {
-//        params.id = thisBank().currency.id 
-//        redirect (controller:"currency", action:"get", params:params )
-//        return        
-//        
-//    }
-//    
-//    def hostCountry() {
-//        params.id = thisBank(request).hostCountry.id
-//        redirect (controller:"Country", action:"get", params:params )
-//        return        
-//    }
-//    
-//    def orgUnit() {
-//        params.id = thisBank().OrgUnit.id
-//        redirect (controller:"orgUnit", action:"get", params:params )
-//        return        
-//    }
-//    
-//    def channels() {
-//        
-//    }
-//    
-//    def hqTimeZone() {
-//        params.id = thisBank().hqTimeZone.id
-//        redirect (controller:"timeZone", action:"get", params:params )
-//        return
-//    }
-//    
-//    def timeZones() {
-//        
-//    }
-//    
-//    def officialLanguage() {
-//        params.id = thisBank().officialLanguage.id
-//        redirect (controller:"language", action:"get", params:params )
-//        return        
-//    }
+    def iban() { 
+        foreignKey()    
+    }   
+    
+    def baseCurrency() {
+        foreignKey()       
+    }
+    
+    def hostCountry() {
+        foreignKey()        
+    }
+    
+    def orgTreeRoot() {
+        foreignKey()          
+    }
+    
+    def hQTimezone() {
+        foreignKey()
+    }
+    
+    def channels() {
+        foreignKey()
+    }
+
+    def officialLanguage() {
+        foreignKey() 
+    }   
+    
+    private foreignKey() {   
+        params.sourceComponent=sourceComponent()
+        params.collection = false
+        params.host = XRenderService.hostApp(request) 
+        params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+        if (params.withlinks == "true") {
+            params.links = XBuildLinksService.controllerLinks(params, request) 
+            params.links += extraLinks()
+        }
+        params.hideclass = true
+        params.URL =  XRenderService.URL(request) 
+        params.sourceURI = "/$params.controller/$params.action"   //internal request to domains
+        renderNow()
+    }
     
     def extraLinks(){ 
         def controllerURL = "$params.host/$params.controller"
         def links = [:]
         links += ["get": ["href": "$controllerURL/getBank"]]
         links += ["iban":["href":  "$controllerURL/iban", "notes":"Returns the IBAN of the Bank"]]
-        links += ["currency":["href":  "$controllerURL/currency", "notes":"Returns the official currency of the Bank"]]
+        links += ["baseCurrency":["href":  "$controllerURL/baseCurrency", "notes":"Returns the official currency of the Bank"]]
         links += ["hostCountry":["href":  "$controllerURL/hostCountry", "notes":"Returns the Country of the Bank"]]
         links += ["orgUnit":["href":  "$controllerURL/orgUnit", "notes":"Returns the root of the Organization Chart of the Bank"]]
-        links += ["hqTimeZone":["href":  "$controllerURL/hqTimeZone", "notes":"Returns the timezone of the Headquarters of the Bank"]]
+        links += ["hQTimezone":["href":  "$controllerURL/hQTimezone", "notes":"Returns the timezone of the Headquarters of the Bank"]]
         links += ["channels":["href":  "$controllerURL/channels", "notes":"Returns a list of the channels of the Bank"]]
         links += ["timeZones":["href":  "$controllerURL/timeZones", "notes":"Returns the timezones of the Bank"]]
         links += ["officialLanguage":["href":  "$controllerURL/officialLanguage", "notes":"Returns the official Language of the Bank"]]
         return links 
-    }    
-    
-    private thisBank(request) {
-        params.sourceComponent=sourceComponent()
-        params.sourceURI="/theBank/" 
-        params.host = RenderService.host(request)
-        params.URL =  RenderService.URL(request)  
-        def answer =""
-        def resp 
-        def rest = new RestBuilder()
-        try {        
-            resp = rest.get("$params.host/theBank/getBank") { 
-                accept "application/json"
-                contentType "application/json"
-                } 
-            return resp.json.body 
-        } 
-        catch(Exception e2) {
-            //answer = ["status":"$resp.status" , "message": "$e2.message", "sourceURI":"$baseURL$params.sourceURI"]  
-            def xe2 = e2.toString() //.message.split(':')
-            answer = ["status":"500", "possibleCause": "Unavailable Domain Server $params.sourceComponent", "message":[xe2]] 
-            return answer 
-        }       
-    }
+    }     
 }

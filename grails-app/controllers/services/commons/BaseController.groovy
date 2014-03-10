@@ -47,8 +47,7 @@ abstract class BaseController {
             params.recStatus = (params.recStatus ? params.recStatus.toLowerCase() : "Active").capitalize()  
             params.sourceURI = "/$params.controller/show.json?id=$id&recStatus=$params.recStatus"   //internal request to domains
             params.URL += "?id=$id&recStatus=$params.recStatus" 
-            renderNow()
-//            render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
+            renderNow()      
             }
         } 
           
@@ -117,7 +116,7 @@ abstract class BaseController {
     
     def create() {
         def uri = "/$params.controller/create.json" //internal request to domains
-//        println uri
+        println uri
         params.sourceComponent=sourceComponent()
         params.collection = false
         params.host = RenderService.hostApp(request) 

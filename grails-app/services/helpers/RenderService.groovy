@@ -81,11 +81,8 @@ class RenderService {
         return x.substring(0,x.indexOf('.dispatch')) - '/grails'	        
     }   
     
-    def hostApp(request) {
-        def appName = entities.Component.findByName("CoreQueries").baseURL 
-//        def x = request.getRequestURL()  
-//        println "appName= $appName x=$x"
-//        return x.substring(0,x.indexOf("$appName") + appName.size())  
+    def hostApp(request = null) {
+        def appName = entities.Component.findByName("CoreQueries").baseURL   
         return appName
     }      
     
