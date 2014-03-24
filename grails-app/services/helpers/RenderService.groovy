@@ -8,7 +8,6 @@ class RenderService {
     static transactional = false
     
     def prepareAnswer(params, request) {
-        println "params.sourceComponent: $params.sourceComponent"
         def baseURL = SysConfigService.getComponent(params.sourceComponent).component.baseURL
 //        def baseURL = entities.Component.findByName(params.sourceComponent).baseURL
         params.reqID = UUID.randomUUID().toString()

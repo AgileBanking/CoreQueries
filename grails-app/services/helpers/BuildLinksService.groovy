@@ -1,6 +1,7 @@
 package helpers
 
 class BuildLinksService {
+    def SysConfigService
     static transactional = false
 
     def controllerLinks(params, request) {
@@ -13,7 +14,7 @@ class BuildLinksService {
             links += ["get":["template": true, "fields": ["id":"String"], "href": "$controllerURL/get?id={id}", "notes":"Retrieves a single resource based on its 'id'. It accepts, optionally, the 'recStatus' parameter"]]
             links += ["schema": ["href": "$controllerURL/schema", "notes":"The schema (properties-fields) of the resource."]]
             links += ["create": ["href": "$controllerURL/create", "notes":"Returns an empty instance of editable fields."]]
-            links += ["save":["template":true, "methods":["PUT", "POST"], "href": entities.Component.findByName('CoreCommands').baseURL + "/$params.controller/save", \
+            links += ["save":["template":true, "methods":["PUT", "POST"], "href": SysConfigService.getComponent('CoreCommands').component.baseURL + "/$params.controller/save", \
                 "body":"@create", "notes":"Using the empty resource from 'create' and using PUT create new resource. If you have not in cache, get the body from the 'create'. For update a resource, retrieved with 'get' use POST to save its new state."]]
             links += ["relatedLinks": ["href": "$controllerURL/relatedLinks", "notes":"Returns a list with the most frequent links."]]
             links += ["theBank": ["href": "$params.host/theBank", "notes":"The unique resource that holds most the operational profile of the Bank."]]
