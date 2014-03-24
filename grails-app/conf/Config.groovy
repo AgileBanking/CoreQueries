@@ -58,6 +58,7 @@ grails.converters.domain.include.version = true
 // URL Mapping Cache Max Size, defaults to 5000
 //grails.urlmapping.cache.maxsize = 1000
 
+grails.resources.adhoc.excludes = ['**/WEB-INF/**','**/META-INF/**']
 
 // What URL patterns should be processed by the resources plugin
 grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*']

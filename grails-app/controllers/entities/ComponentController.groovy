@@ -1,14 +1,14 @@
 package entities
-
+import grails.plugins.rest.client.RestBuilder
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.web.json.*
 import org.springframework.dao.DataIntegrityViolationException
-
 import grails.converters.*
 
 class ComponentController {
-        
+    def ConfiguratorService
+    
     static allowedMethods = [
         save: "POST", 
         update: "POST", 
@@ -87,13 +87,14 @@ class ComponentController {
         [componentInstance: new Component(params)]
     }
 
+    @Transactional
     def save() {
-        def componentInstance = new Component(params)
+        println "And now ready to save the component."
+        def componentInstance = new Component(params) 
         if (!componentInstance.save(flush: true)) {
             render(view: "create", model: [componentInstance: componentInstance])
             return
-        }
-
+        }       
         flash.message = message(code: 'default.created.message', args: [message(code: 'component.label', default: 'Component'), componentInstance.id])
         redirect(action: "show", id: componentInstance.id)
     }
@@ -145,6 +146,10 @@ class ComponentController {
             return
         }
 
+        // Update configdb
+        println "I am going to update the $componentInstance.name"
+        ConfiguratorService.saveComponents(componentInstance.name)    
+        
         flash.message = message(code: 'default.updated.message', args: [message(code: 'component.label', default: 'Component'), componentInstance.id])
         redirect(action: "show", id: componentInstance.id)
     }

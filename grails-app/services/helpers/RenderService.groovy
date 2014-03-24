@@ -38,19 +38,23 @@ class RenderService {
                 contentType "application/json"
                 } 
             params.status = resp.status 
-            if (resp.status < 300 && resp.json.class != null) { 
-                resp.json.remove("class") 
-            }
-            if (params.hide) {
-                params.hide.each {
-                    resp.json.remove("$it") 
+            def etag = ""
+            if (resp.json != null) {
+                if (resp.status < 300 && resp.json.class != null) { 
+                    resp.json.remove("class") 
                 }
-                params.remove("hide")
+                if (params.hide) {
+                    params.hide.each {
+                        resp.json.remove("$it") 
+                    }
+                    params.remove("hide")
+                }    
+            }
+            else {
+                etag = makeEtag(resp.json.toString())
             }
             // If not modified return nothing  
-            def etag = makeEtag(resp.json.toString())
             def rETag = request.getHeader("If-None-Match") + "" 
-//            println "rETag: $rETag, pTag: $etag" 
             params.ETag = etag 
             if ("$rETag" == "$etag") { 
                 params.status = 304
@@ -99,4 +103,6 @@ class RenderService {
 //        MessageDigest digest = MessageDigest.getInstance("SHA-256")
 //        byte[] hash = digest.digest(text.getBytes("UTF-8"));        
     }
+    
+    
 }

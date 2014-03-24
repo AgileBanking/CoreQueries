@@ -162,8 +162,8 @@ abstract class BaseController {
             answer.header.error="$e3.message" 
         }
         // sort entries keeping the top entries as ordered
-        answer.header = answer.header.sort {it.key}
-        answer.body = answer.body.sort {it.key}
+        answer.header = answer.header.sort {it.key} 
+        if (answer.body) {answer.body = answer.body.sort {it.key}}
         if (answer.links) {answer.links = answer.links.sort {it.key}}
         
         render (contentType: "application/json", text:answer as JSON, status:params.status, ETag:params.ETag,"Cache-Control":params."Cashe-Control")         

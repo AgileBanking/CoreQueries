@@ -13,6 +13,7 @@ class AdminController {
     LinkGenerator grailsLinkGenerator
     def RenderService
     def BuildLinksService
+    def ConfiguratorService
     
     def index() {redirect(action: "menu") }
 
@@ -50,6 +51,7 @@ class AdminController {
           </ol>
           <li><a href="componentsActionsByController" target="_blank">Actions by Controller</a></li>\n\
           <li><a href="repo" target="_blank">Resources (services) repository</a></li>\n\
+          <li><a href="refreshComponentsConfig" target="_blank">Refresh Components Configuration</a></li>\n\
         </ol>
         [*] You can address specific component by appending:<br>
         ?ComponentName={component}<br>
@@ -76,7 +78,7 @@ class AdminController {
                 def url = "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/"  
                 url += "[Composer]<>0..*-0..*>[CoreQueries],[Composer]<>0..*-0..*>[CoreCommands],[CoreCommands]<>0..*-0..*>[CoreQueries],[CoreQueries]<>0..*-0..*>[Accounts], [CoreQueries]<>0..*-0..*>[Commons], [CoreQueries]<>0..*-0..*>[Parties], [CoreQueries]<>0..*-0..*>[Products],[CoreQueries]<>0..*-0..*>[API Repository],"
                 url += "[CoreCommands]<>0..*-0..*>[Accounts], [CoreCommands]<>0..*-0..*>[Commons], [CoreCommands]<>0..*-0..*>[Parties], [CoreCommands]<>0..*-0..*>[Products],[CoreCommands]<>0..*-0..*>[API Repository],[Policies]<-[CoreQueries],[Policies]<-[CoreCommands],[Policies]<-[Composer],"       
-                url += "[Logging]<>0..*-0..*>[APE (Asynch Processing Engine)],[Policies]<>0..*-0..*>[RBAC],[Policies]<>0..*-0..*>[Scheduler],[Scheduler]<>0..*-0..*>[MailManager], [Scheduler]<>0..*-0..*>[ReportingEngine],[Scheduler]<>0..*-0..*>[APE (Asynch Processing Engine)],[Policies]<>0..*-0..*>[Logging],"
+                url += "[Logging]<>0..*-0..*>[APE (Asynch Processing Engine)],[Policies]<>0..*-0..*>[IAM-SSO-RBAC],[Policies]<>0..*-0..*>[Scheduler],[Scheduler]<>0..*-0..*>[MailManager], [Scheduler]<>0..*-0..*>[ReportingEngine],[Scheduler]<>0..*-0..*>[APE (Asynch Processing Engine)],[Policies]<>0..*-0..*>[Logging],"
                 url += "[Clients]<>0..*-0..*>[Composer],[Clients]<>0..*-0..*>[CoreQueries],[Clients]<>0..*-0..*>[CoreCommands],[Clients]<>0..*-0..*>[BizProcessor],[BizProcessor]<>0..*-0..*>[Composer],[BizProcessor]<>0..*-0..*>[CoreQueries],[BizProcessor]<>0..*-0..*>[CoreCommands]"
                 redirect (url:"$url")
                 return
@@ -433,5 +435,11 @@ class AdminController {
         def result = ["component": component, "controllers": controllerLinks] as JSON
         render result
     }
+    
+    def refreshComponentsConfig() {
+        ConfiguratorService.saveComponents(null)
+        def result = ["status":"200", "description":"Components Configuration refreshed" ] as JSON
+        render result
+    }    
     
 }
