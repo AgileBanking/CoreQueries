@@ -4,11 +4,13 @@ import grails.converters.*
 import java.security.MessageDigest 
 
 class RenderService {
-    
+    def SysConfigService
     static transactional = false
     
     def prepareAnswer(params, request) {
-        def baseURL = entities.Component.findByName(params.sourceComponent).baseURL
+        println "params.sourceComponent: $params.sourceComponent"
+        def baseURL = SysConfigService.getComponent(params.sourceComponent).component.baseURL
+//        def baseURL = entities.Component.findByName(params.sourceComponent).baseURL
         params.reqID = UUID.randomUUID().toString()
         params.Date = new Date().toString()
         params.method = request.method.toUpperCase()
@@ -86,7 +88,8 @@ class RenderService {
     }   
     
     def hostApp(request = null) {
-        def appName = entities.Component.findByName("CoreQueries").baseURL   
+        def appName = SysConfigService.getComponent("CoreQueries").component.baseURL
+        //def appName = entities.Component.findByName("CoreQueries").baseURL   
         return appName
     }      
     

@@ -33,6 +33,7 @@ class BootStrap {
            def pr    =  new entities.Component(name:"Products",     appVersion:"1.0", baseURL:"http://localhost:9803/Products").save()
            def ac    =  new entities.Component(name:"Accounts",     appVersion:"1.0", baseURL:"http://localhost:9804/Accounts").save()
            def po    =  new entities.Component(name:"Policies",     appVersion:"1.0", baseURL:"http://localhost:8888/Policies").save()
+           def repo  =  new entities.Component(name:"Repository",   appVersion:"1.0", baseURL:"http://localhost:8889/Repository").save()
        }
 
 //        servletContext.globalVariable  = anyValue 

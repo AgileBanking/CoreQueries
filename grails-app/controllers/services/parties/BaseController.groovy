@@ -146,10 +146,11 @@ abstract class BaseController {
         
         // Keep Audit
         try {
-            if (entities.Component.findByName("Auditor").isActive) { 
+            def auditor = SysConfigService.getComponent("Auditor")
+            if (auditor.component.isActive) { 
                 // store in the auditdb (CouchDB)
                 def restAudit = new RestBuilder()
-                def url = entities.Component.findByName("Auditor").baseURL + "/$params.reqID"
+                def url = auditor.component.baseURL + "/$params.reqID"
                 answer.header.auditRec = "$url"
                 def respAudit = restAudit.put("$url"){
                     contentType "application/json"
