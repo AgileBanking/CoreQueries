@@ -39,16 +39,18 @@ class AdminController {
           <li><a href="JSD" target="_blank">Data
         Model in JSON Schema[*]</a></li>\n\
           <li><a href="modelDiagram" target="_blank">Model
-        Diagram</a></li>
-          <li><a href="relationsDiagram" target="_blank">Relations
-        Diagram</a></li>
+        Diagram</a></li>\n\
+          <!--
+          <li><a href="modelDiagram" target="_blank">Relations
+        Diagram</a></li>\n\
           <ol>
-            <li><a href="relationsDiagram?ComponentName=CoreQueries" target="_blank">CoreLayer</li>
+            <li><a href="modelDiagram" target="_blank">CoreLayer</li>\n\
             <li><a href="relationsDiagram?ComponentName=Commons" target="_blank">Commons</li>
             <li><a href="relationsDiagram?ComponentName=Parties" target="_blank">Parties</li>
             <li><a href="relationsDiagram?ComponentName=Products" target="_blank">Products</li>
             <li><a href="relationsDiagram?ComponentName=Accounts" target="_blank">Accounts</li>\n\
-          </ol>
+          </ol>\n\
+          -->
           <li><a href="componentsActionsByController" target="_blank">Actions by Controller</a></li>\n\
           <li><a href="repo" target="_blank">Resources (services) repository</a></li>\n\
           <li><a href="refreshComponentsConfig" target="_blank">Refresh Components Configuration</a></li>\n\
@@ -78,8 +80,9 @@ class AdminController {
                 def url = "http://yuml.me/diagram/nofunky;dir:TD/class/draw2/"  
                 url += "[Composer]<>0..*-0..*>[CoreQueries],[Composer]<>0..*-0..*>[CoreCommands],[CoreCommands]<>0..*-0..*>[CoreQueries],[CoreQueries]<>0..*-0..*>[Accounts], [CoreQueries]<>0..*-0..*>[Commons], [CoreQueries]<>0..*-0..*>[Parties], [CoreQueries]<>0..*-0..*>[Products],[CoreQueries]<>0..*-0..*>[API Repository],"
                 url += "[CoreCommands]<>0..*-0..*>[Accounts], [CoreCommands]<>0..*-0..*>[Commons], [CoreCommands]<>0..*-0..*>[Parties], [CoreCommands]<>0..*-0..*>[Products],[CoreCommands]<>0..*-0..*>[API Repository],[Policies]<-[CoreQueries],[Policies]<-[CoreCommands],[Policies]<-[Composer],"       
-                url += "[Logging]<>0..*-0..*>[APE (Asynch Processing Engine)],[Policies]<>0..*-0..*>[IAM-SSO-RBAC],[Policies]<>0..*-0..*>[Scheduler],[Scheduler]<>0..*-0..*>[MailManager], [Scheduler]<>0..*-0..*>[ReportingEngine],[Scheduler]<>0..*-0..*>[APE (Asynch Processing Engine)],[Policies]<>0..*-0..*>[Logging],"
-                url += "[Clients]<>0..*-0..*>[Composer],[Clients]<>0..*-0..*>[CoreQueries],[Clients]<>0..*-0..*>[CoreCommands],[Clients]<>0..*-0..*>[BizProcessor],[BizProcessor]<>0..*-0..*>[Composer],[BizProcessor]<>0..*-0..*>[CoreQueries],[BizProcessor]<>0..*-0..*>[CoreCommands]"
+                url += "[Policies]<>0..*-0..*>[IAM-SSO-RBAC],[Policies]<>0..*-0..*>[Scheduler],[Scheduler]<>0..*-0..*>[MailManager], [Scheduler]<>0..*-0..*>[ReportingEngine],[APE (Asynch Processing Engine)]<>0..*-0..*>[Logging],"
+                url += "[Clients]<>0..*-0..*>[Composer],[Clients]<>0..*-0..*>[CoreQueries],[Clients]<>0..*-0..*>[CoreCommands],[Clients]<>0..*-0..*>[BizProcessor],[BizProcessor]<>0..*-0..*>[Composer],[BizProcessor]<>0..*-0..*>[CoreQueries],[BizProcessor]<>0..*-0..*>[CoreCommands],"
+                url += "[Composer]<>0..*-0..*[APE (Asynch Processing Engine)],[APE (Asynch Processing Engine)]<>0..0..*[Business Intelligence]"
                 redirect (url:"$url")
                 return
             }
@@ -103,7 +106,10 @@ class AdminController {
         }            
     }   
     
+    /*
     def relationsDiagram() {
+        def componentName = params?.ComponentName
+        println "componentName=$componentName"
         // check if internet connection is available
         URL html = new URL('http://yuml.me');
         URLConnection urlConnection = html.openConnection();
@@ -115,6 +121,7 @@ class AdminController {
         }
         // if there is internet connection ask yUML.me to draw the diagram, else use the local image
         if (urlConnection.connected) {
+            println "Connection available"
             def domainClasses = grailsApplication.getArtefacts("Domain")
             def classes = ''
             def classrelation = ''
@@ -129,7 +136,7 @@ class AdminController {
                             // if its association only show the owning side
                             if(!prop.isBidirectional() || prop.isOwningSide() || proType == domainClass.name )
                                 classrelation = getRelationship(domainClass.name, prop)
-                                if (!relationships.contains(classrelation)) {
+                                if (!relationships.contains(classrelation) && !relations.contains(classrelation)) {
                                     relations = "$relations \n$classrelation" 
                                 }
                         } else {
@@ -168,7 +175,7 @@ class AdminController {
             render (reldiagram)
         }        
     }
-    
+    */
     
     def componentsActionsByController(String ComponentName, String ControllerName) {
         // example: /server/ComponentsActionsByController?ComponentName=Commons&ControllerName=Currency
@@ -311,7 +318,7 @@ class AdminController {
         def xsd
         def componentName = grailsApplication.metadata['app.name']
         if (ComponentName==null || ComponentName=="$componentName") {
-            def className = ClassName
+            def className = ClassName?.capitalize()
             def componentSchema = grailsApplication.getArtefacts("Domain")
             def writer = new StringWriter()
             def schema = new MarkupBuilder(writer)  
@@ -370,7 +377,7 @@ class AdminController {
                                                "xs:element"(name:"${p.name}", type:"${str}")   
                                        }
                                }
-                        }
+                            }
                        }
                      }
                     }

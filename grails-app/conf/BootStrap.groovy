@@ -9,17 +9,17 @@ class BootStrap {
         def respAudit = restAudit.put("http://localhost:5984/auditdb"){} 
        }
        catch(Exception e){
-           println "Auditdb is not accessible"
+           println "auditdb is not accessible in my local environment"
            grailsApplication.config.custome.auditdb.isOn = true
        }
        
-        // create componentsdb, if not exists
+        // create configdb, if not exists
        try {
         def restConfig = new RestBuilder()
         def respConfig = restConfig.put("http://localhost:5984/configdb"){} 
        }
        catch(Exception e){
-           println "ComponentsDB is not accessible"
+           println "configdb is not accessible in my local environment"
            grailsApplication.config.custome.auditdb.isOn = true
        }        
        

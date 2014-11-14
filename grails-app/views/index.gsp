@@ -88,6 +88,7 @@
                             <li>User: ${System.getProperty("user.name")}</li>
                             <li>Time zone: ${TimeZone.getDefault().getDisplayName()}</li>
                             <li>Server Time: ${new Date().getDateTimeString()}</li>
+                            <li>Application: ${grails.util.Metadata.current.'app.name'}</li>
                           </ul>
 			<h1>Application Status</h1>
 			<ul>

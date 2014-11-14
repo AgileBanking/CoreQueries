@@ -26,6 +26,8 @@ abstract class BaseController {
     
     def RenderService
     def BuildLinksService
+    def AccessControlService
+    def SysConfigService
           
     def get(String id) { 
         if (params.id==null || !params.id.isLong() ) {

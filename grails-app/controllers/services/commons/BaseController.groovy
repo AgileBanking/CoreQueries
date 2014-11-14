@@ -19,6 +19,7 @@ abstract class BaseController {
     def index() { redirect(action: "shortList", params: params) }
     
     private sourceComponent() {"Commons"}
+    
 //    def casheControl() {"public, max-age=5" } // 72000 for 20 hours
 //    def casheControl() {"private, no-cache, no-store" }
     def casheControl() {"public, max-age=60" } // re-read it after 60"
@@ -27,6 +28,7 @@ abstract class BaseController {
     def BuildLinksService
     def AccessControlService
     def SysConfigService
+    
           
     def get(String id) { 
         if (params.id==null || !params.id.isLong() ) {
@@ -164,7 +166,7 @@ abstract class BaseController {
         // Keep Audit
         try {
             def auditor = SysConfigService.getComponent("Auditor")
-            if (auditor.component.isActive) { 
+            if (auditor.component.keepAudit) { 
                 // store in the auditdb (CouchDB)
                 def restAudit = new RestBuilder()
                 def url = auditor.component.baseURL + "/$params.reqID"
