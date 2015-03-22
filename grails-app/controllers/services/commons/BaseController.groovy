@@ -57,14 +57,14 @@ abstract class BaseController {
     def list() {
 //        def token = request.getHeader("Token")
 //        println "And now authorize me with toke: $token"
-//
 //        println AccessControlService.authenticate(token)
 
-//        params.token = token
+        params.token = token
         params.sourceComponent=sourceComponent()
         params.collection = true
         params.host = RenderService.hostApp(request)
         params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
+        
         if (params.withlinks == "true"  ) {
             params.links = BuildLinksService.controllerLinks(params, request)  
             params.links += extraLinks()            
@@ -75,18 +75,25 @@ abstract class BaseController {
         params.offset = params.offset ? params.int('offset') : 0
         params.recStatus = (params.recStatus ? params.recStatus.toLowerCase() : "Active").capitalize() 
         params.sourceURI="/$params.controller/index.json?max=$params.max&offset=$params.offset&recStatus=$params.recStatus"
+        
         renderNow()
 //        render (text:RenderService.prepareAnswer(params, request), status:params.status, ETag:params.ETag)      
         }      
 
     def shortList() {
         // ../CoreQueries/currency/shortList
+//        def token = request.getHeader("Token")
+//        println "And now authorize me with toke: $token"
+//        println AccessControlService.authenticate(token)
+        
         params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
         params.URL =  RenderService.URL(request)  
         params.sourceComponent=sourceComponent()
         params.host = RenderService.hostApp(request)
         params.recStatus = (params.recStatus ? params.recStatus.toLowerCase() : "Active").capitalize() 
-        params.sourceURI="/$params.controller/shortList?recStatus=$params.recStatus" 
+        params.sourceURI = "/$params.controller/shortList?recStatus=$params.recStatus"          
+//        params.sourceURI = "/$params.controller/index.json?recStatus=$params.recStatus"          
+        
         if (params.withlinks == "true"  ) {
             params.links = BuildLinksService.controllerLinks(params, request)
             params.links += extraLinks()            
@@ -103,6 +110,7 @@ abstract class BaseController {
 
 //        params.token = token        
         def uri = "/admin/JSD?ComponentName=Parties&ClassName=" + params.controller.capitalize() //internal request to domains
+        println "schema uri: $uri"
         params.sourceComponent=sourceComponent()
         params.collection = false
         params.host = RenderService.hostApp(request) 
@@ -119,7 +127,7 @@ abstract class BaseController {
     
     def create() {
         def uri = "/$params.controller/create.json" //internal request to domains
-        println uri
+//        println uri
         params.sourceComponent=sourceComponent()
         params.collection = false
         params.host = RenderService.hostApp(request) 
@@ -141,6 +149,7 @@ abstract class BaseController {
         def result = [:]
         result.controller = params.controller 
         params.links = BuildLinksService.controllerLinks(params, request)
+//        println  "BaseController: $params.host/$result.controller/relatedLinks" 
         params.links += ["self": ["href": "$params.host/$result.controller/relatedLinks"]]
         params.links += extraLinks()
         result.links= params.links            
@@ -153,10 +162,9 @@ abstract class BaseController {
     }
     
     private renderNow() {
-//        println "And now render"
         params."Cashe-Control" = casheControl()
         response.setHeader("Cache-Control",params."Cashe-Control")
-        response.setHeader("ETag",params.ETag)          
+        response.setHeader("ETag",params.ETag)         
         def answer = RenderService.prepareAnswer(params, request)   
         if ( params.status == 304) { // Not Modified: return the shortest possible answer without decoration
             render status:"$params.status"
@@ -165,18 +173,14 @@ abstract class BaseController {
         
         // Keep Audit
         try {
-            def auditor = SysConfigService.getComponent("Auditor")
-            if (auditor.component.keepAudit) { 
-                // store in the auditdb (CouchDB)
-                def restAudit = new RestBuilder()
-                def url = auditor.component.baseURL + "/$params.reqID"
-                answer.header.auditRec = "$url"
-                def respAudit = restAudit.put("$url"){
-                    contentType "application/json"
-                    json {["header":answer.header, "body":answer.body]} 
-                }
-                answer.links += ["audit":["href" : "$url"]]
-            }            
+            def restAudit = new RestBuilder()
+            def url = "http://backend.gate:6789/Auditor/$params.reqID"
+            answer.header.auditRec = "$url"
+            def respAudit = restAudit.put("$url"){
+                contentType "application/json"
+                json {["header":answer.header, "body":answer.body]} 
+            }
+            answer.links += ["audit":["href" : "$url"]]          
         }
         catch(Exception e3) {
             answer.header.error="$e3.message" 
@@ -185,7 +189,6 @@ abstract class BaseController {
         answer.header = answer.header.sort {it.key}
         answer.body = answer.body.sort {it.key}
         if (answer.links) {answer.links = answer.links.sort {it.key}}
-        
         render (contentType: "application/json", text:answer as JSON, status:params.status, ETag:params.ETag,"Cache-Control":params."Cashe-Control")         
     }
 }

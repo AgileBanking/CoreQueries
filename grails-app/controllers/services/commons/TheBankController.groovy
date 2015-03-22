@@ -75,7 +75,7 @@ class TheBankController extends BaseController {
     }
     
     def extraLinks(){ 
-        def controllerURL = "$params.host/$params.controller"
+        def controllerURL = "http://$params.host/$params.controller"
         def links = [:]
         links += ["get": ["href": "$controllerURL/getBank"]]
         links += ["iban":["href":  "$controllerURL/iban", "notes":"Returns the IBAN of the Bank"]]

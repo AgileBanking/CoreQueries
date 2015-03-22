@@ -48,7 +48,7 @@ class OrgUnitController extends BaseController {
         }         
         
     def extraLinks(){ 
-        def controllerURL = "$params.host/$params.controller"
+        def controllerURL = "http://$params.host/$params.controller"
         def links = [:]
         links += ["getByCode":["template":true, "fields": ["code":"String (Organization Unit code)"], \
             "href":  "$controllerURL/getByCode?code={code}" ]]

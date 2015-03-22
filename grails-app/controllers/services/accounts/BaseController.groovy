@@ -1,5 +1,5 @@
 package services.accounts
-
+import grails.plugins.rest.client.RestBuilder
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.web.json.*
@@ -72,7 +72,7 @@ abstract class BaseController {
 
     def shortList() {
         // ../CoreQueries/currency/shortList
-        println "from shortList"
+//        println "from shortList"
         params.withlinks = params.withlinks ? params.withlinks.toLowerCase() : "true" 
         params.URL =  RenderService.URL(request)  
         params.sourceComponent=sourceComponent()
@@ -132,15 +132,34 @@ abstract class BaseController {
     }     
 
     private renderNow() {
+        params."Cashe-Control" = casheControl()
+        response.setHeader("Cache-Control",params."Cashe-Control")
+        response.setHeader("ETag",params.ETag)         
         def answer = RenderService.prepareAnswer(params, request)   
         if ( params.status == 304) { // Not Modified: return the shortest possible answer without decoration
             render status:"$params.status"
             return
+        }        
+        
+        // Keep Audit
+        try {
+            def restAudit = new RestBuilder()
+            def url = "http://backend.gate:6789/Auditor/$params.reqID"
+            answer.header.auditRec = "$url"
+            def respAudit = restAudit.put("$url"){
+                contentType "application/json"
+                json {["header":answer.header, "body":answer.body]} 
+            }
+            answer.links += ["audit":["href" : "$url"]]          
         }
-        params."Cashe-Control" = casheControl()
-        response.setHeader("Cache-Control",params."Cashe-Control")
-        response.setHeader("ETag",params.ETag)          
-        render (contentType: "application/json", text:answer, status:params.status, ETag:params.ETag,"Cache-Control":params."Cashe-Control")         
+        catch(Exception e3) {
+            answer.header.error="$e3.message" 
+        }
+        // sort entries keeping the top entries as ordered
+        answer.header = answer.header.sort {it.key}
+        answer.body = answer.body.sort {it.key}
+        if (answer.links) {answer.links = answer.links.sort {it.key}}
+        render (contentType: "application/json", text:answer as JSON, status:params.status, ETag:params.ETag,"Cache-Control":params."Cashe-Control")         
     }
     
     // returns an array with extra links to be attached in the response by the caller

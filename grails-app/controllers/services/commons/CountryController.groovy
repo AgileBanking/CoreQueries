@@ -32,7 +32,7 @@ class CountryController extends BaseController {
         
     def extraLinks() { 
         def links = [:]
-        def controllerURL = "$params.host/$params.controller"
+        def controllerURL = "http://$params.host/$params.controller"
         links += ["getByIso2":["template":true, "fields": ["iso2":"String (Country: ISO 3166 alpha-2 code)"], \
             "href":  "$controllerURL/getByIso2?iso2={iso2}" ]]
         links += ["references":["ISO 3166 alpha-2 code": "http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2",

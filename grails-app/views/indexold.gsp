@@ -29,7 +29,7 @@
 				margin-bottom: 0.6em;
 				padding: 0;
 			}
-
+            
 			#status li {
 				line-height: 1.3;
 			}
@@ -88,6 +88,7 @@
                             <li>User: ${System.getProperty("user.name")}</li>
                             <li>Time zone: ${TimeZone.getDefault().getDisplayName()}</li>
                             <li>Server Time: ${new Date().getDateTimeString()}</li>
+                            <li>Application: ${grails.util.Metadata.current.'app.name'}</li>
                           </ul>
 			<h1>Application Status</h1>
 			<ul>
@@ -99,11 +100,20 @@
                             <li>Domains: ${grailsApplication.domainClasses.size()}</li>
                             <li>Services: ${grailsApplication.serviceClasses.size()}</li>
                             <li>Tag Libraries: ${grailsApplication.tagLibClasses.size()}</li>
+                            <li>Keep Audit: ${grailsApplication.config.custome.auditdb.isOn}</li>
 			</ul>
-                        <h1>Servers</h1>
+                        <h1>Server</h1>
                         <ul>
-                            <li>Host Name  : ${InetAddress.localHost.hostName}</li>
-                            <li>IP Address : ${InetAddress.localHost.hostAddress}</li> 
+                            <li>Local Host Name: ${InetAddress.localHost.hostName}</li>
+                            <li>IP Address     : ${InetAddress.localHost.hostAddress}</li> 
+                            <!--
+                            <li>Host Name      : ${InetAddress.localHost.canonicalHostName}</li>
+                            -->
+                            <!--
+                            <li>DNS App Server: ${"nslookup commons.app control.lan".execute().text.trim().split(/(\n)/).last().split(/(:)/)[1].trim()}</li>
+                            <li>DNS Database: ${"nslookup commons.db control.lan".execute().text.trim().split(/(\n)/).last().split(/(:)/)[1].trim()}</li>
+                            <li>DNS Server: ${"nslookup control.lan control.lan".execute().text.trim().split(/(\n)/).last().split(/(:)/)[1].trim()}</li>                            
+                            -->
                         </ul>
 			<h1>Installed Plugins</h1>
                             <ul>
@@ -113,16 +123,18 @@
                             </ul>
 		</div>
 		<div id="page-body" role="main">
-                    <h2>Component: CORE QUERIES</h2>
+			<h1>Welcome to  Agile Banking</h1>
+                        
+                        <h2>Component: CORE QUERIES LAYER</h2>
 			<p>This is the Core Queries layer of the 'Agile Banking' that exposes READ ONLY data. You can access all Core resources with HTTP GET method:</p>
 			<p>These components have been implemented as MVC pattern. The following list shows all available controllers.<p>
 
 			<div id="controller-list" role="navigation">
 				<h2>Available Controllers:</h2>
 				<ul>
-					<g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
-						<li class="controller"><g:link controller="${c.logicalPropertyName}">${c.fullName - "admin." - "services." - "entities." - "Controller" - "asset.pipeline." - 'grails.plugin.'}</g:link></li>
-					</g:each>
+                                    <g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
+                                            <li class="controller"><g:link controller="${c.logicalPropertyName}">${c.fullName - 'admin.' - 'Controller' - 'server.' - 'services.' - 'entities.' - 'grails.plugin.databasemigration.'}</g:link></li>
+                                    </g:each>
 				</ul>
 			</div>
 		</div>

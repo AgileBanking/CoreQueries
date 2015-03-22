@@ -27,7 +27,7 @@ class CurrencyController extends BaseController {
         }       
         
     def extraLinks() { 
-        def controllerURL = "$params.host/$params.controller"
+        def controllerURL = "http://$params.host/$params.controller"
         def links = [:]
         links += ["getByIso3":["template":true, "fields": ["iso3":"String"], "href":  "$controllerURL/getByIso3?iso3={iso3}"]]
         return links 

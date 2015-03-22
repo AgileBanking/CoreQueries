@@ -1,23 +1,23 @@
 dataSource {
     // h2
-//    pooled = true
-//    driverClassName = "org.h2.Driver"
-//    username = "sa"
-//    password = ""
+    pooled = true
+    driverClassName = "org.h2.Driver"
+    username = "sa"
+    password = ""
 
     // MySQL
-    pooled = true
-    driverClassName = "com.mysql.jdbc.Driver"
-    username = "root" 
-    password = "agiler" 
+//    pooled = true
+//    driverClassName = "com.mysql.jdbc.Driver"
+//    username = "client" 
+//    password = "agiler" 
 
 
 }
 hibernate {
     cache.use_second_level_cache = true
     cache.use_query_cache = false
-    cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // Hibernate 3
-//    cache.region.factory_class = 'org.hibernate.cache.ehcache.EhCacheRegionFactory' // Hibernate 4
+//    cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // Hibernate 3
+    cache.region.factory_class = 'org.hibernate.cache.ehcache.EhCacheRegionFactory' // Hibernate 4
 }
 
 // environment specific settings
@@ -25,9 +25,9 @@ environments {
     development {
         dataSource {
             dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
-//            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
-//            url = "jdbc:h2:coreDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
-            url = "jdbc:mysql://localhost:3306/coredb"   
+            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
+//            url = "jdbc:mysql://localhost:3306/coredb"   
+//              url = "jdbc:mysql://queries.pi:3306/core"
         }
     }
     test {
@@ -39,7 +39,7 @@ environments {
     }
     production {
         dataSource {
-            dbCreate = "update"
+            dbCreate = "create-drop"  // We do not really need any database
             url = "jdbc:h2:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
 //            url = "jdbc:mysql://localhost:3306/commons" 
             properties {

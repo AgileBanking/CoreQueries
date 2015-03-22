@@ -31,7 +31,7 @@ class TimezoneController extends BaseController {
    
     def extraLinks() { 
         def links = [:]
-        def controllerURL = "$params.host/$params.controller"
+        def controllerURL = "http://$params.host/$params.controller"
         links += ["getByLocation":["template":true, "fields": ["location":"String (City name)"], \
             "href":  "$controllerURL/getByLocation?location={location}" ]]
         return links 

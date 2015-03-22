@@ -8,8 +8,9 @@ class RenderService {
     static transactional = false
     
     def prepareAnswer(params, request) {
-        def baseURL = SysConfigService.getComponent(params.sourceComponent).component.baseURL
-//        def baseURL = entities.Component.findByName(params.sourceComponent).baseURL
+//        def baseURL = SysConfigService.getComponent(params.sourceComponent).appServer 
+        def baseURL = "http://backend.gate:6789/$params.sourceComponent"
+//        println "baseURL: $baseURL"
         params.reqID = UUID.randomUUID().toString()
         params.Date = new Date().toString()
         params.method = request.method.toUpperCase()
@@ -34,12 +35,14 @@ class RenderService {
         def rest = new RestBuilder()
 //        params.error = "none"
         try {        
+//            println "$baseURL$params.sourceURI"
             resp = rest.get("$baseURL$params.sourceURI") { 
                 accept "application/json"
                 contentType "application/json"
                 } 
             params.status = resp.status 
             def etag = ""
+            etag = makeEtag(resp.json.toString())
             if (resp.json != null) {
                 if (resp.status < 300 && resp.json.class != null) { 
                     resp.json.remove("class") 
@@ -49,10 +52,10 @@ class RenderService {
                         resp.json.remove("$it") 
                     }
                     params.remove("hide")
-                }    
+                } 
+                etag = makeEtag(resp.json.toString())
             }
             else {
-                etag = makeEtag(resp.json.toString())
             }
             // If not modified return nothing  
             def rETag = request.getHeader("If-None-Match") + "" 
@@ -83,13 +86,15 @@ class RenderService {
     
     def URL(request) {
         def x = request.getRequestURL() 
+//          println "requested URL: " +  x.substring(0,x.indexOf('.dispatch')) - '/grails'
         return x.substring(0,x.indexOf('.dispatch')) - '/grails'	        
     }   
     
     def hostApp(request = null) {
-        def appName = SysConfigService.getComponent("CoreQueries").component.baseURL
-        //def appName = entities.Component.findByName("CoreQueries").baseURL   
-        return appName
+        return "http://backend.gate:6789/CoreQueries"
+//        def appName = entities.Component.findByName("CoreQueries").appServer  
+//        println "appName: $appName"
+//        return appName
     }      
     
     def makeEtag(String s) {

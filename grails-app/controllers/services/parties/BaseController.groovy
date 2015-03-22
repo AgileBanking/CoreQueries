@@ -136,11 +136,11 @@ abstract class BaseController {
         return [:]
     }
     
-    private renderNow() {
+private renderNow() {
         params."Cashe-Control" = casheControl()
         response.setHeader("Cache-Control",params."Cashe-Control")
-        response.setHeader("ETag",params.ETag)          
-        def answer = RenderService.prepareAnswer(params, request)  
+        response.setHeader("ETag",params.ETag)         
+        def answer = RenderService.prepareAnswer(params, request)   
         if ( params.status == 304) { // Not Modified: return the shortest possible answer without decoration
             render status:"$params.status"
             return
@@ -148,28 +148,22 @@ abstract class BaseController {
         
         // Keep Audit
         try {
-            def auditor = SysConfigService.getComponent("Auditor")
-            if (auditor.component.isActive) { 
-//                 store in the auditdb (CouchDB)
-                def restAudit = new RestBuilder()
-                def url = auditor.component.baseURL + "/$params.reqID"
-                printl "url: " + url
-                answer.header.auditRec = "$url"
-                def respAudit = restAudit.put("$url"){
-                    contentType "application/json"
-                    json {["header":answer.header, "body":answer.body]} 
-                }
-                answer.links += ["audit":["href" : "$url"]]
-            }    
+            def restAudit = new RestBuilder()
+            def url = "http://backend.gate:6789/Auditor/$params.reqID"
+            answer.header.auditRec = "$url"
+            def respAudit = restAudit.put("$url"){
+                contentType "application/json"
+                json {["header":answer.header, "body":answer.body]} 
+            }
+            answer.links += ["audit":["href" : "$url"]]          
         }
-        catch(Exception e3) { 
+        catch(Exception e3) {
             answer.header.error="$e3.message" 
         }
         // sort entries keeping the top entries as ordered
-        answer.header = answer.header.sort {it.key} 
-        if (answer.body) {answer.body = answer.body.sort {it.key}}
+        answer.header = answer.header.sort {it.key}
+        answer.body = answer.body.sort {it.key}
         if (answer.links) {answer.links = answer.links.sort {it.key}}
-        
         render (contentType: "application/json", text:answer as JSON, status:params.status, ETag:params.ETag,"Cache-Control":params."Cashe-Control")         
     }
 }

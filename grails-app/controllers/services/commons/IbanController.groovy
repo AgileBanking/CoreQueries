@@ -33,7 +33,7 @@ class IbanController extends BaseController {
         def controllerURL = XRenderService.hostApp(request) + "/$params.controller"
         def links = [:]
         links += ["getByCountryIso2":["template":true, "fields": ["iso2":"String (Country: ISO 3166 alpha-2 code)"], \
-            "href":  "$controllerURL/getByCountryIso2?iso2={iso2}" ]]
+            "href":  "http://$controllerURL/getByCountryIso2?iso2={iso2}" ]]
         links += ["references":[\
             "Country":["ISO 3166 alpha-2 code": "http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2",
                 "ISO 3166 alpha-3 code": "http://en.wikipedia.org/wiki/ISO_3166-1_alpha-3",

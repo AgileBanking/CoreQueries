@@ -5,19 +5,19 @@ import grails.converters.*
 class AccessControlService {
 
     def authenticate(String token) {
-        println "Hi, from AccessControl.authenticate"
+//        println "Hi, from AccessControl.authenticate"
         def baseURL = entities.Component.findByName("Policies").baseURL
         def resp
         def rest = new RestBuilder()
         try {        
-            println "$baseURL/user/authenticate?token=$token" 
+//            println "$baseURL/user/authenticate?token=$token" 
             resp = rest.get("$baseURL/user/authenticate?token=$token" ) { 
                 accept "application/json"
                 contentType "application/json"
                 } 
             if (resp.status == 401) {   //Unauthorized. LogIn
                 def restLogin = new RestBuilder()
-                println "$baseURL/j_spring_security_check" 
+//                println "$baseURL/j_spring_security_check" 
 //                respLogin = restLogin.get("$baseURL/j_spring_security_check?username='admin'&password='admin'"  ) { 
                 respLogin = restLogin.get("$baseURL/j_spring_security_check"  ) { 
                     accept "application/json"

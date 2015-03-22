@@ -23,7 +23,7 @@ class ConfiguratorService {
                 def respConfig
                 allComponents.each {
                     def j = it as JSON
-                    println "$url/$it.name"
+//                    println "$url/$it.name"
                     def respV = restConfig.get("$url/$it.name") { 
                         accept "application/json"
                         contentType "application/json"
