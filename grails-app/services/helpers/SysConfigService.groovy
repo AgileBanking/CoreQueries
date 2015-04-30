@@ -7,7 +7,7 @@ class SysConfigService {
         // It seems that I do not need it
     def getComponent(String component) { 
         def restConfig = new RestBuilder()
-        def url = "http://backend.gate:6789/$component"
+        def url = "http://agilebanking.net:6789/$component"
 //        def url = "http://auditdb:5984/configdb/$component" 
 //        println "getComponent url: " + url
         def respV = restConfig.get("$url") { 
@@ -20,7 +20,7 @@ class SysConfigService {
     
 //    def getComponentHost(String component) {
 //        def restConfig = new RestBuilder() 
-//        def url = "http://backend.gate:6789/$component"
+//        def url = "http://agilebanking.net:6789/$component"
 ////        def url = "http://auditdb:5984/configdb/$component" 
 //        println "getComponentHost url: " + url
 //        def respV = restConfig.get("$url") { 
@@ -32,7 +32,7 @@ class SysConfigService {
     
     def isComponentActive(String component) {
         def restConfig = new RestBuilder()
-        def url = "http://backend.gate:6789/$component"
+        def url = "http://agilebanking.net:6789/$component"
 //        def url = "http://auditdb:5984/configdb/$component" 
 //        println "isComponentActive url: " + url
         def respV = restConfig.get("$url") { 

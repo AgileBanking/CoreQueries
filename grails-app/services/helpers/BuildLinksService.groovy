@@ -19,7 +19,7 @@ class BuildLinksService {
             links += ["schema": ["href": "$controllerURL/schema", "notes":"The schema (properties-fields) of the resource."]]
             links += ["create": ["href": "$controllerURL/create", "notes":"Returns an empty instance of editable fields."]]
 //            links += ["save":["template":true, "methods":["PUT", "POST"], "href": SysConfigService.getComponent('CoreCommands').appServer + "/$params.controller/save", \
-            links += ["save":["template":true, "methods":["PUT", "POST"], "href": "http://backend.gate:6789/CoreCommands" + "/$params.controller/save", \
+            links += ["save":["template":true, "methods":["PUT", "POST"], "href": "http://agilebanking.net:6789/CoreCommands" + "/$params.controller/save", \
                 "body":"@create", "notes":"Using the empty resource from 'create' and using PUT create new resource. If you have not in cache, get the body from the 'create'. For update a resource, retrieved with 'get' use POST to save its new state."]]
             links += ["relatedLinks": ["href": "$controllerURL/relatedLinks", "notes":"Returns a list with the most frequent links."]]
             links += ["theBank": ["href": "$params.host/theBank", "notes":"The unique resource that holds most the operational profile of the Bank."]]

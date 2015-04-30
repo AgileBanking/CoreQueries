@@ -174,7 +174,7 @@ abstract class BaseController {
         // Keep Audit
         try {
             def restAudit = new RestBuilder()
-            def url = "http://backend.gate:6789/Auditor/$params.reqID"
+            def url = "http://agilebanking.net:6789/Auditor/$params.reqID"
             answer.header.auditRec = "$url"
             def respAudit = restAudit.put("$url"){
                 contentType "application/json"

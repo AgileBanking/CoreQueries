@@ -9,7 +9,7 @@ class RenderService {
     
     def prepareAnswer(params, request) {
 //        def baseURL = SysConfigService.getComponent(params.sourceComponent).appServer 
-        def baseURL = "http://backend.gate:6789/$params.sourceComponent"
+        def baseURL = "http://agilebanking.net:6789/$params.sourceComponent"
 //        println "baseURL: $baseURL"
         params.reqID = UUID.randomUUID().toString()
         params.Date = new Date().toString()
@@ -91,7 +91,7 @@ class RenderService {
     }   
     
     def hostApp(request = null) {
-        return "http://backend.gate:6789/CoreQueries"
+        return "http://agilebanking.net:6789/CoreQueries"
 //        def appName = entities.Component.findByName("CoreQueries").appServer  
 //        println "appName: $appName"
 //        return appName
